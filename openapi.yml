@@ -1,0 +1,819 @@
+openapi: 3.0.2
+info:
+  title: ToolForge API
+  description: ToolForge is the self-serve tools platform for teams
+  contact:
+    email: api@toolforge.io
+  version: 0.0.0
+servers:
+  - url: https://api.toolforge.io/v1
+tags:
+  - name: tool
+    description: Endpoints for manipulating tools
+  - name: execution
+    description: Endpoints for manipulating executions
+paths:
+  /tools:
+    get:
+      tags:
+        - tool
+      summary: List tools
+      description: List one page of tools
+      operationId: listTools
+      parameters:
+        - name: limit
+          in: query
+          description: The maximum number of tools to return per page
+          schema:
+            type: integer
+            format: int32
+        - name: cursor
+          in: query
+          description: The pagination cursor
+          schema:
+            type: string
+            format: ToolCursor
+      responses:
+        200:
+          description: The list of tools was returned successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ToolPage'
+                
+  /tools/{toolId}:
+    parameters:
+      - $ref: '#/components/parameters/toolId'
+    get:
+      tags:
+        - tool
+      summary: Get tool
+      description: Get metadata about one tool
+      operationId: getTool
+      responses:
+        200:
+          description: The tool was found successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tool'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+  /tools/{toolId}/execute:
+    parameters:
+      - $ref: '#/components/parameters/toolId'
+    post:
+      tags:
+        - tool
+        - execution
+      summary: Execute latest tool version
+      description: Execute the latest version of the given tool
+      operationId: executeLatestToolVersion
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/Invocation'
+      responses:
+        201:
+          description: The execution was created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Execution'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+  /tools/{toolId}/versions:
+    parameters:
+      - $ref: '#/components/parameters/toolId'
+    get:
+      tags:
+        - tool
+      summary: List tool versions
+      description: List one page of versions of the given tool. Tool versions are sorted by creation time, descending.
+      operationId: listToolVersions
+      responses:
+        200:
+          description: The tool was found successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ToolPage'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+  /tools/{toolId}/versions/{toolVersion}:
+    parameters:
+      - $ref: '#/components/parameters/toolId'
+      - $ref: '#/components/parameters/toolVersion'
+    get:
+      tags:
+        - tool
+      summary: Get tool version
+      description: Get metadata about one version of one tool
+      operationId: getToolVersion
+      responses:
+        200:
+          description: The tool was found successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tool'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+  /tools/{toolId}/versions/{toolVersion}/execute:
+    parameters:
+      - $ref: '#/components/parameters/toolId'
+      - $ref: '#/components/parameters/toolVersion'
+    post:
+      tags:
+        - tool
+        - execution
+      summary: Execute tool version
+      description: Execute the given version of the given tool
+      operationId: executeToolVersion
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/Invocation'
+      responses:
+        201:
+          description: The execution was created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Execution'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+  /executions:
+    get:
+      tags:
+        - execution
+      summary: List executions
+      description: List one page of executions
+      operationId: listExecutions
+      parameters:
+        - name: limit
+          in: query
+          description: The maximum number of executions to return per page
+          schema:
+            type: integer
+            format: int32
+        - name: cursor
+          in: query
+          description: The pagination cursor
+          schema:
+            type: string
+            format: ExecutionCursor
+      responses:
+        200:
+          description: The list of executions returned successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExecutionPage'
+
+  /executions/{executionId}:
+    parameters:
+      - $ref: '#/components/parameters/executionId'
+    get:
+      tags:
+        - execution
+      summary: Get execution
+      description: Get metadata about one execution
+      operationId: getExecution
+      responses:
+        200:
+          description: The execution was retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Execution'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        404:
+          $ref: '#/components/responses/NotFound'
+        410:
+          $ref: '#/components/responses/Gone'
+
+  /executions/{executionId}/logs:
+    parameters:
+      - $ref: '#/components/parameters/executionId'
+    get:
+      tags:
+        - execution
+      summary: Get execution log page
+      description: Get a page of the execution's logs
+      operationId: listExecutionLogs
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - name: cursor
+          in: query
+          description: The pagination cursor
+          schema:
+            type: string
+            format: LogCursor
+      responses:
+        200:
+          description: The execution was retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogPage'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        404:
+          $ref: '#/components/responses/NotFound'
+        410:
+          $ref: '#/components/responses/Gone'
+
+  /executions/{executionId}/inputs/{inputSlotId}:
+    parameters:
+      - $ref: '#/components/parameters/executionId'
+      - $ref: '#/components/parameters/inputSlotId'
+    get:
+      tags:
+        - execution
+      summary: Get execution input
+      description: Get metadata about the given execution's given input slot
+      operationId: getExecutionInputSlot
+      responses:
+        200:
+          description: The input slot was retrieved successfully.
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: binary
+        403:
+          $ref: '#/components/responses/Forbidden'
+        404:
+          $ref: '#/components/responses/NotFound'
+        410:
+          $ref: '#/components/responses/Gone'
+
+  /executions/{executionId}/outputs/{outputSlotId}:
+    parameters:
+      - $ref: '#/components/parameters/executionId'
+      - $ref: '#/components/parameters/outputSlotId'
+    get:
+      tags:
+        - execution
+      summary: Get execution output
+      description: Get metadata about the given execution's given output slot
+      operationId: getExecutionOutputSlot
+      responses:
+        200:
+          description: The output slot was retrieved successfully.
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: binary
+        202:
+          description: The given execution is still running, so the data is not available at this time, but may be available later.
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        404:
+          $ref: '#/components/responses/NotFound'
+        409:
+          description: The given execution has failed, so the data is not available at this time, and will not be available later.
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+        410:
+          $ref: '#/components/responses/Gone'
+          
+  /blobs:
+    post:
+      tags:
+        - blob
+      summary: Create a blob
+      description: Create a new blob from the given data
+      operationId: createBlob
+      responses:
+        200:
+          description: The blob was created successfully
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Blob'
+  
+  /blobs/{blobId}:
+    parameters:
+      - $ref: '#/components/parameters/blobId'
+    get:
+      tags:
+        - blob
+      summary: Get a blob
+      description: Retrieve information about the given blob
+      operationId: getBlob
+      responses:
+        200:
+          description: The blob was created successfully
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Blob'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+components:
+  responses:
+    Processing:
+      description: The requested data is still processing and is not ready yet.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ErrorMessage'
+    Forbidden:
+      description: The current user does not have permission to perform the operation.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ErrorMessage'
+    NotFound:
+      description: The object could not be found.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ErrorMessage'
+    Gone:
+      description: The object has expired.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ErrorMessage'
+            
+  parameters:
+    toolId:
+      name: toolId
+      in: path
+      description: The ID of the tool to manipulate
+      required: true
+      schema:
+        type: string
+        format: ToolId
+    toolVersion:
+      name: toolVersion
+      in: path
+      description: The version of the tool to manipulate
+      required: true
+      schema:
+        type: string
+        format: VersionId
+    executionId:
+      name: executionId
+      in: path
+      description: The ID of the execution to manipulate
+      required: true
+      schema:
+        type: string
+        format: ExecutionId
+    inputSlotId:
+      name: inputSlotId
+      in: path
+      description: The ID of the input slot to manipulate
+      required: true
+      schema:
+        type: string
+        format: InputSlotId
+    outputSlotId:
+      name: outputSlotId
+      in: path
+      description: The ID of the output slot to manipulate
+      required: true
+      schema:
+        type: string
+        format: OutputSlotId
+    blobId:
+      name: blobId
+      in: path
+      description: The ID of the blob to manipulate
+      required: true
+      schema:
+        type: string
+        format: BlobId
+    limit:
+      name: limit
+      in: query
+      description: The maximum number of items to return per page
+      required: false
+      schema:
+        type: integer
+        format: int32
+    
+  schemas:
+    # application/problem+json
+    # https://datatracker.ietf.org/doc/html/rfc7807
+    # https://lakitna.medium.com/understanding-problem-json-adf68e5cf1f8
+    ErrorMessage:
+      type: object
+      properties:
+        type:
+          type: string
+          format: url
+        title:
+          type: string
+        status:
+          type: integer
+          format: int32
+        detail:
+          type: string
+        instance:
+          type: string
+          
+    LogPage:
+      type: object
+      required:
+      - entries
+      properties:
+        entries:
+          type: array
+          items:
+            $ref: '#/components/schemas/LogEntry'
+        cursor:
+          type: string
+          format: LogCursor
+      
+    LogEntry:
+      type: object
+      required:
+      - timestamp
+      - message
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+          
+    ToolPreview:
+      type: object
+      properties:
+        id:
+          type: string
+          format: ToolId
+        name:
+          type: string
+        description:
+          type: string
+          format: markdown
+
+    Tool:
+      allOf:
+        - $ref: '#/components/schemas/ToolPreview'
+        - type: object
+          properties:
+            parameters:
+              type: array
+              items:
+                $ref: '#/components/schemas/Parameter'
+            inputs:
+              type: array
+              items:
+                $ref: '#/components/schemas/InputSlot'
+            outputs:
+              type: array
+              items:
+                $ref: '#/components/schemas/OutputSlot'
+            
+    InputSlot:
+      type: object
+      required:
+        - name
+        - description
+      properties:
+        name:
+          type: string
+          pattern: "^[a-zA-Z][a-zA-Z0-9]*$"
+          maxLength: 64
+        description:
+          type: string
+        extensions:
+          type: array
+          items:
+            type: string
+            format: FileExtension
+          
+    OutputSlot:
+      type: object
+      required:
+        - name
+        - description
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        extensions:
+          type: array
+          items:
+            type: string
+            format: FileExtension
+
+    ToolPage:
+      type: object
+      properties:
+        entries:
+          type: array
+          items:
+            $ref: '#/components/schemas/ToolPreview'
+        cursor:
+          type: string
+          format: ToolCursor
+
+    ParameterType:
+      type: string
+      enum:
+        - int
+        - float
+        - string
+        - date
+        - boolean
+        
+    Parameter:
+      type: object
+      required:
+        - type
+        - name
+        - description
+        - required
+      properties:
+        type:
+          $ref: '#/components/schemas/ParameterType'
+        name:
+          type: string
+          pattern: '^[a-zA-Z][a-zA-Z0-9]*'
+          maxLength: 64
+        description:
+          type: string
+        required:
+          type: boolean
+          default: true
+      discriminator:
+        propertyName: type
+        mapping:
+          int: IntParameter
+          float: FloatParameter
+          string: StringParameter
+          date: DateParameter
+          boolean: BooleanParameter
+          
+    IntParameter:
+      allOf:
+        - $ref: '#/components/schemas/Parameter'
+        - type: object
+          properties:
+            minimum:
+              type: integer
+              format: int64
+            maximum:
+              type: integer
+              format: int64
+
+    FloatParameter:
+      allOf:
+        - $ref: '#/components/schemas/Parameter'
+        - type: object
+          properties:
+            minimum:
+              type:  number
+              format: double
+            maximum:
+              type: number
+              format: double
+
+    StringDomainType:
+      type: string
+      enum:
+        - pattern
+        - enumeration
+              
+    StringDomain:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/StringDomainType'
+      required:
+        - type
+      discriminator:
+        propertyName: type
+        mapping:
+          pattern: PatternStringDomain
+          enumeration: EnumerationStringDomain
+          
+    PatternStringDomain:
+      allOf:
+        - $ref: '#/components/schemas/StringDomain'
+        - type: object
+          required:
+            - pattern
+          properties:
+            pattern:
+              type: string
+              format: regex
+    
+    EnumerationStringDomain:
+      allOf:
+        - $ref: '#/components/schemas/StringDomain'
+        - type: object
+          required:
+            - values
+          properties:
+            values:
+              type: array
+              uniqueItems: true
+              minItems: 1
+              items:
+                type: string
+
+    StringParameter:
+      allOf:
+        - $ref: '#/components/schemas/Parameter'
+        - type: object
+          required:
+            - domain
+          properties:
+            domain:
+              $ref: '#/components/schemas/StringDomain'
+                
+    # TODO Do we need some kind of meta-language for minimum and maximum? It would be useful to saying things like "minimum: today"
+    DateParameter:
+      allOf:
+        - $ref: '#/components/schemas/Parameter'
+        - type: object
+          properties:
+            minimum:
+              type: string
+              format: date
+            maximum:
+              type: string
+              format: date
+        
+    BooleanParameter:
+      allOf:
+        - $ref: '#/components/schemas/Parameter'
+        - type: object
+            
+    Argument:
+      type: object
+      properties:
+        name:
+          type: string
+          pattern: "^[a-zA-Z][a-zA-Z0-9]*$"
+          maxLength: 64
+        value:
+          $ref: '#/components/schemas/ArgumentValue'
+          
+    ArgumentValue:
+      anyOf:
+        - type: string
+        - type: integer
+          format: int64
+        - type: number
+          format: double
+        - type: boolean
+        
+        
+    InputDataType:
+      type: string
+      enum:
+        - blob
+        
+    InputData:
+      type: object
+      required:
+        - type
+      properties:
+        type:
+          $ref: '#/components/schemas/InputDataType'
+      discriminator:
+        propertyName: type
+        mapping:
+          blob: BlobInputData
+        
+    BlobInputData:
+      allOf:
+        - $ref: '#/components/schemas/InputDataType'
+        - type: object
+          properties:
+            blob:
+              type: string
+              format: BlobId
+    
+    Input:
+      type: object
+      properties:
+        name:
+          type: string
+          pattern: "^[a-zA-Z][a-zA-Z0-9]*$"
+          maxLength: 64
+        data:
+          $ref: '#/components/schemas/InputData'
+            
+    Invocation:
+      type: object
+      properties:
+        arguments:
+          type: array
+          items:
+            $ref: '#/components/schemas/Argument'
+        inputs:
+          type: array
+          items:
+            $ref: '#/components/schemas/Input'
+            
+    ExecutionState:
+      type: string
+      enum:
+        - starting
+        - running
+        - succeeded
+        - failed
+        
+    ToolReference:
+      type: object
+      required:
+        - id
+        - version
+      properties:
+        id:
+          type: string
+          format: ToolId
+        version:
+          type: string
+          format: ToolVersion
+          
+    ExecutionPage:
+      type: object
+      properties:
+        entries:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExecutionPreview'
+        cursor:
+          type: string
+          format: ExecutionCursor
+          
+    ExecutionPreview:
+      type: object
+      properties:
+        tool:
+          $ref: '#/components/schemas/ToolReference'
+        name:
+          type: string
+        state:
+          $ref: '#/components/schemas/ExecutionState'
+
+    # TODO How do we represent inputs? status?
+    # TODO How do we represent outputs? status?
+    Execution:
+      allOf:
+        - $ref: '#/components/schemas/ExecutionPreview'
+        - type: object
+          properties:
+            arguments:
+              type: array
+              items:
+                $ref: '#/components/schemas/Argument'
+            inputs:
+              type: array
+              items:
+                $ref: '#/components/schemas/InputSlot'
+            outputs:
+              type: array
+              items:
+                $ref: '#/components/schemas/OutputSlot'
+
+    Blob:
+      type: object
+      properties:
+        id:
+          type: string
+          format: BlobId
+        extension:
+          type: string
+        size:
+          type: integer
+          format: int64
