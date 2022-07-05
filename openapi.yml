@@ -98,6 +98,19 @@ paths:
       summary: List tool versions
       description: List one page of versions of the given tool. Tool versions are sorted by creation time, descending.
       operationId: listToolVersions
+      parameters:
+        - name: limit
+          in: query
+          description: The maximum number of tools to return per page
+          schema:
+            type: integer
+            format: int32
+        - name: cursor
+          in: query
+          description: The pagination cursor
+          schema:
+            type: string
+            format: ToolCursor
       responses:
         200:
           description: The tool was found successfully.
@@ -535,10 +548,13 @@ components:
     ToolPage:
       type: object
       properties:
-        entries:
+        items:
           type: array
           items:
             $ref: '#/components/schemas/ToolPreview'
+        total:
+          type: integer
+          format: int32
         cursor:
           type: string
           format: ToolCursor

@@ -70,14 +70,14 @@
                     <artifactId>maven-clean-plugin</artifactId>
                     <version>3.2.0</version>
                     <configuration>
-                      <filesets>
-                        <fileset>
-                          <directory>src/gen/java</directory>
-                          <excludes>
-                            <exclude>.openapi-generator-ignore</exclude>
-                          </excludes>
-                        </fileset>
-                      </filesets>
+                        <filesets>
+                            <fileset>
+                                <directory>src/gen/java</directory>
+                                <excludes>
+                                    <exclude>.openapi-generator-ignore</exclude>
+                                </excludes>
+                            </fileset>
+                        </filesets>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -87,9 +87,15 @@
                     <configuration>
                         <importMappings>
                             <importMapping>DateExpr=io.toolforge.spi.model.DateExpr</importMapping>
+                            <importMapping>ToolCursor=io.toolforge.spi.model.ToolCursor</importMapping>
+                            <importMapping>ToolId=io.toolforge.spi.model.ToolId</importMapping>
+                            <importMapping>ToolVersion=io.toolforge.spi.model.ToolVersion</importMapping>
                         </importMappings>
                         <typeMappings>
                             <typeMapping>string+DateExpr=DateExpr</typeMapping>
+                            <typeMapping>string+ToolCursor=ToolCursor</typeMapping>
+                            <typeMapping>string+ToolId=ToolId</typeMapping>
+                            <typeMapping>string+VersionId=ToolVersion</typeMapping>
                         </typeMappings>
                     </configuration>
                     <executions>
