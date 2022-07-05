@@ -48,7 +48,7 @@
     </issueManagement>
 
     <properties>
-        <java.version>11</java.version>
+        <java.version>17</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -86,12 +86,10 @@
                     <version>5.4.0</version>
                     <configuration>
                         <importMappings>
-                            <importMapping>BinaryImage=io.toolforge.spi.model.BinaryImage</importMapping>
-                            <importMapping>FaceId=io.toolforge.spi.model.FaceId</importMapping>
-                            <importMapping>Roll=io.toolforge.spi.model.Role</importMapping>
+                            <importMapping>DateExpr=io.toolforge.spi.model.DateExpr</importMapping>
                         </importMappings>
                         <typeMappings>
-                            <typeMapping>string+role=Role</typeMapping>
+                            <typeMapping>string+DateExpr=DateExpr</typeMapping>
                         </typeMappings>
                     </configuration>
                     <executions>

@@ -591,6 +591,9 @@ components:
             maximum:
               type: integer
               format: int64
+            default:
+              type: integer
+              format: int64
 
     FloatParameter:
       allOf:
@@ -601,6 +604,9 @@ components:
               type:  number
               format: double
             maximum:
+              type: number
+              format: double
+            default:
               type: number
               format: double
 
@@ -657,6 +663,8 @@ components:
           properties:
             domain:
               $ref: '#/components/schemas/StringDomain'
+            default:
+              type: string
                 
     # TODO Do we need some kind of meta-language for minimum and maximum? It would be useful to saying things like "minimum: today"
     DateParameter:
@@ -666,15 +674,21 @@ components:
           properties:
             minimum:
               type: string
-              format: date
+              format: DateExpr
             maximum:
               type: string
-              format: date
+              format: DateExpr
+            default:
+              type: string
+              format: DateExpr
         
     BooleanParameter:
       allOf:
         - $ref: '#/components/schemas/Parameter'
         - type: object
+          properties:
+            default:
+              type: boolean
             
     Argument:
       type: object
@@ -694,7 +708,6 @@ components:
         - type: number
           format: double
         - type: boolean
-        
         
     InputDataType:
       type: string
