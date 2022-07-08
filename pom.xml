@@ -86,13 +86,17 @@
                     <version>5.4.0</version>
                     <configuration>
                         <importMappings>
+                            <importMapping>BlobId=io.toolforge.spi.model.BlobId</importMapping>
                             <importMapping>DateExpr=io.toolforge.spi.model.DateExpr</importMapping>
+                            <importMapping>ExecutionId=io.toolforge.spi.model.ExecutionId</importMapping>
                             <importMapping>ToolCursor=io.toolforge.spi.model.ToolCursor</importMapping>
                             <importMapping>ToolId=io.toolforge.spi.model.ToolId</importMapping>
                             <importMapping>ToolVersion=io.toolforge.spi.model.ToolVersion</importMapping>
                         </importMappings>
                         <typeMappings>
+                            <typeMapping>string+BlobId=BlobId</typeMapping>
                             <typeMapping>string+DateExpr=DateExpr</typeMapping>
+                            <typeMapping>string+ExecutionId=ExecutionId</typeMapping>
                             <typeMapping>string+ToolCursor=ToolCursor</typeMapping>
                             <typeMapping>string+ToolId=ToolId</typeMapping>
                             <typeMapping>string+VersionId=ToolVersion</typeMapping>

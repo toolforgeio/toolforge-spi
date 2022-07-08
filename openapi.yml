@@ -224,6 +224,31 @@ paths:
         410:
           $ref: '#/components/responses/Gone'
 
+  /executions/{executionId}/cancel:
+    parameters:
+      - $ref: '#/components/parameters/executionId'
+    get:
+      tags:
+        - execution
+      summary: Cancel execution
+      description: Cancel an execution
+      operationId: cancelExecution
+      responses:
+        200:
+          description: The execution was canceled successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Execution'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        404:
+          $ref: '#/components/responses/NotFound'
+        409:
+          $ref: '#/components/responses/Conflict'
+        410:
+          $ref: '#/components/responses/Gone'
+
   /executions/{executionId}/logs:
     parameters:
       - $ref: '#/components/parameters/executionId'
@@ -483,10 +508,26 @@ components:
           
     ToolPreview:
       type: object
+      required:
+        - id
+        - owner
+        - createdAt
       properties:
         id:
           type: string
           format: ToolId
+        version:
+          type: string
+          format: VersionId
+        owner:
+          type: string
+          format: AccountId
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
         name:
           type: string
         description:
@@ -505,13 +546,13 @@ components:
             inputs:
               type: array
               items:
-                $ref: '#/components/schemas/InputSlot'
+                $ref: '#/components/schemas/ToolInput'
             outputs:
               type: array
               items:
-                $ref: '#/components/schemas/OutputSlot'
+                $ref: '#/components/schemas/ToolOutput'
             
-    InputSlot:
+    ToolInput:
       type: object
       required:
         - name
@@ -525,11 +566,13 @@ components:
           type: string
         extensions:
           type: array
+          uniqueItems: true
+          minItems: 1
           items:
             type: string
             format: FileExtension
           
-    OutputSlot:
+    ToolOutput:
       type: object
       required:
         - name
@@ -541,6 +584,8 @@ components:
           type: string
         extensions:
           type: array
+          uniqueItems: true
+          minItems: 1
           items:
             type: string
             format: FileExtension
@@ -682,7 +727,6 @@ components:
             default:
               type: string
                 
-    # TODO Do we need some kind of meta-language for minimum and maximum? It would be useful to saying things like "minimum: today"
     DateParameter:
       allOf:
         - $ref: '#/components/schemas/Parameter'
@@ -717,7 +761,7 @@ components:
           $ref: '#/components/schemas/ArgumentValue'
           
     ArgumentValue:
-      anyOf:
+      oneOf:
         - type: string
         - type: integer
           format: int64
@@ -725,33 +769,33 @@ components:
           format: double
         - type: boolean
         
-    InputDataType:
+    InvocationDataType:
       type: string
       enum:
         - blob
         
-    InputData:
+    InvocationData:
       type: object
       required:
         - type
       properties:
         type:
-          $ref: '#/components/schemas/InputDataType'
+          $ref: '#/components/schemas/InvocationDataType'
       discriminator:
         propertyName: type
         mapping:
-          blob: BlobInputData
+          blob: BlobInvocationData
         
-    BlobInputData:
+    BlobInvocationData:
       allOf:
-        - $ref: '#/components/schemas/InputDataType'
+        - $ref: '#/components/schemas/InvocationData'
         - type: object
           properties:
             blob:
               type: string
               format: BlobId
     
-    Input:
+    InvocationInput:
       type: object
       properties:
         name:
@@ -759,7 +803,7 @@ components:
           pattern: "^[a-zA-Z][a-zA-Z0-9]*$"
           maxLength: 64
         data:
-          $ref: '#/components/schemas/InputData'
+          $ref: '#/components/schemas/InvocationData'
             
     Invocation:
       type: object
@@ -771,15 +815,21 @@ components:
         inputs:
           type: array
           items:
-            $ref: '#/components/schemas/Input'
+            $ref: '#/components/schemas/InvocationInput'
             
     ExecutionState:
       type: string
       enum:
+        # The execution has been invoked, but has not started running yet.
         - starting
+        # The execution is currently running. It has not completed yet.
         - running
+        # The execution has completed running successfully.
         - succeeded
+        # The execution has completed running unsuccessfully.
         - failed
+        # The execution was cancelled by the user.
+        - cancelled
         
     ToolReference:
       type: object
@@ -792,7 +842,7 @@ components:
           format: ToolId
         version:
           type: string
-          format: ToolVersion
+          format: VersionId
           
     ExecutionPage:
       type: object
@@ -808,6 +858,9 @@ components:
     ExecutionPreview:
       type: object
       properties:
+        id:
+          type: string
+          format: ExecutionId
         tool:
           $ref: '#/components/schemas/ToolReference'
         name:
@@ -829,11 +882,57 @@ components:
             inputs:
               type: array
               items:
-                $ref: '#/components/schemas/InputSlot'
+                $ref: '#/components/schemas/ExecutionInput'
             outputs:
               type: array
               items:
-                $ref: '#/components/schemas/OutputSlot'
+                $ref: '#/components/schemas/ExecutionOutput'
+                
+    ExecutionDataState:
+      type: string
+      enum:
+        # The data is not available now, but may be available in the future.
+        - waiting
+        # The data is available now.
+        - populated
+        # The data is not available now and will not be available in the future
+        # because the execution completed successfully but did not populate it.
+        - unpopulated
+        # The data is not available now and will not be available in the future
+        # because the execution did not complete successfully. 
+        - cancelled
+
+    ExecutionInput:
+      type: object
+      properties:
+        name:
+          type: string
+          pattern: "^[a-zA-Z][a-zA-Z0-9]*$"
+          maxLength: 64
+        state:
+          $ref: '#/components/schemas/ExecutionDataState'
+
+    ExecutionOutput:
+      type: object
+      properties:
+        name:
+          type: string
+          pattern: "^[a-zA-Z][a-zA-Z0-9]*$"
+          maxLength: 64
+        representations:
+          type: array
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/ExecutionOutputRepresentation'
+
+    ExecutionOutputRepresentation:
+      type: object
+      properties:
+        extension:
+          type: string
+          format: FileExtension
+        state:
+          $ref: '#/components/schemas/ExecutionDataState'
 
     Blob:
       type: object
