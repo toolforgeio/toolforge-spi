@@ -280,16 +280,22 @@ paths:
         410:
           $ref: '#/components/responses/Gone'
 
-  /executions/{executionId}/inputs/{inputSlotId}:
+  /executions/{executionId}/inputs/{name}:
     parameters:
       - $ref: '#/components/parameters/executionId'
-      - $ref: '#/components/parameters/inputSlotId'
+      - name: name
+        in: path
+        description: The name of the input to retrieve
+        required: true
+        schema:
+          type: string
+          format: ExecutionInputName
     get:
       tags:
         - execution
       summary: Get execution input
       description: Get metadata about the given execution's given input slot
-      operationId: getExecutionInputSlot
+      operationId: getExecutionInputData
       responses:
         200:
           description: The input slot was retrieved successfully.
@@ -305,16 +311,22 @@ paths:
         410:
           $ref: '#/components/responses/Gone'
 
-  /executions/{executionId}/outputs/{outputSlotId}:
+  /executions/{executionId}/outputs/{name}:
     parameters:
       - $ref: '#/components/parameters/executionId'
-      - $ref: '#/components/parameters/outputSlotId'
+      - name: name
+        in: path
+        description: The name of the output to retrieve
+        required: true
+        schema:
+          type: string
+          format: ExecutionOutputName
     get:
       tags:
         - execution
       summary: Get execution output
       description: Get metadata about the given execution's given output slot
-      operationId: getExecutionOutputSlot
+      operationId: getExecutionOutputData
       responses:
         200:
           description: The output slot was retrieved successfully.
@@ -341,16 +353,73 @@ paths:
                 $ref: '#/components/schemas/ErrorMessage'
         410:
           $ref: '#/components/responses/Gone'
-          
+
+  /executions/{executionId}/outputs/{name}.{extension}:
+    parameters:
+      - $ref: '#/components/parameters/executionId'
+      - name: name
+        in: path
+        description: The name of the output to retrieve
+        required: true
+        schema:
+          type: string
+          format: ExecutionOutputName
+      - name: extension
+        in: path
+        description: The extension of the output to retrieve
+        required: true
+        schema:
+          type: string
+          format: ExecutionOutputExtension
+    get:
+      tags:
+        - execution
+      summary: Get execution output
+      description: Get metadata about the given execution's given output slot
+      operationId: getExecutionOutputExtensionData
+      responses:
+        200:
+          description: The output slot was retrieved successfully.
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: binary
+        202:
+          description: The given execution is still running, so the data is not available at this time, but may be available later.
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        404:
+          $ref: '#/components/responses/NotFound'
+        409:
+          description: The given execution has failed, so the data is not available at this time, and will not be available later.
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+        410:
+          $ref: '#/components/responses/Gone'
+         
   /blobs:
     post:
       tags:
         - blob
       summary: Create a blob
+      # NOTE: Send filename on x-blob-filename header.
       description: Create a new blob from the given data
       operationId: createBlob
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              type: string
+              format: binary
       responses:
-        200:
+        201:
           description: The blob was created successfully
           content:
             'application/json':
@@ -428,14 +497,6 @@ components:
       schema:
         type: string
         format: ExecutionId
-    inputSlotId:
-      name: inputSlotId
-      in: path
-      description: The ID of the input slot to manipulate
-      required: true
-      schema:
-        type: string
-        format: InputSlotId
     outputSlotId:
       name: outputSlotId
       in: path
@@ -759,7 +820,7 @@ components:
           maxLength: 64
         value:
           $ref: '#/components/schemas/ArgumentValue'
-          
+
     ArgumentValue:
       oneOf:
         - type: string

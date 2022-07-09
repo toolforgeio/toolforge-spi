@@ -1,39 +1,45 @@
 package io.toolforge.spi.model;
 
-import static java.util.Objects.requireNonNull;
 import java.util.Comparator;
 import java.util.Objects;
-import java.util.UUID;
+import java.util.regex.Pattern;
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonValue;
+import io.toolforge.spi.model.util.Nonces;
 
 public class BlobId implements Comparable<BlobId> {
+  private static final Pattern PATTERN = Pattern.compile("^[0-9a-z]{8}$");
+
   public static BlobId generate() {
-    return of(UUID.randomUUID());
+    return of(Nonces.nonce36(8));
   }
 
-  public static BlobId of(UUID uuid) {
-    return new BlobId(uuid);
+  public static BlobId of(String s) {
+    return new BlobId(s);
   }
 
   @JsonCreator
   public static BlobId fromString(String s) {
-    return of(UUID.fromString(s));
+    return of(s);
   }
 
-  private final UUID uuid;
+  private final String text;
 
-  public BlobId(UUID uuid) {
-    this.uuid = requireNonNull(uuid);
+  public BlobId(String text) {
+    if (!PATTERN.matcher(text).matches())
+      throw new IllegalArgumentException(text);
+    this.text = text;
   }
 
-  private UUID getUuid() {
-    return uuid;
+  /**
+   * @return the text
+   */
+  private String getText() {
+    return text;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(uuid);
+    return Objects.hash(text);
   }
 
   @Override
@@ -45,13 +51,12 @@ public class BlobId implements Comparable<BlobId> {
     if (getClass() != obj.getClass())
       return false;
     BlobId other = (BlobId) obj;
-    return Objects.equals(uuid, other.uuid);
+    return Objects.equals(text, other.text);
   }
 
   @Override
-  @JsonValue
   public String toString() {
-    return getUuid().toString();
+    return getText();
   }
 
   public static final Comparator<BlobId> COMPARATOR = Comparator.comparing(BlobId::toString);
