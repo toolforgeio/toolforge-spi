@@ -1,43 +1,35 @@
 package io.toolforge.spi.model;
 
 import static java.util.Objects.requireNonNull;
-import java.nio.charset.StandardCharsets;
-import java.time.Instant;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
-import java.util.Base64;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonValue;
 
 public class LogCursor {
   @JsonCreator
   public static LogCursor fromString(String s) {
-    long millis =
-        Long.parseLong(new String(Base64.getUrlDecoder().decode(s), StandardCharsets.UTF_8));
-    return of(Instant.ofEpochMilli(millis).atOffset(ZoneOffset.UTC));
+    return of(s);
   }
 
-  public static LogCursor of(OffsetDateTime timestamp) {
-    return new LogCursor(timestamp);
+  public static LogCursor of(String token) {
+    return new LogCursor(token);
   }
 
-  private final OffsetDateTime timestamp;
+  private final String token;
 
-  public LogCursor(OffsetDateTime timestamp) {
-    this.timestamp = requireNonNull(timestamp);
+  public LogCursor(String token) {
+    this.token = requireNonNull(token);
   }
 
   /**
-   * @return the timestamp
+   * @return the token
    */
-  public OffsetDateTime getTimestamp() {
-    return timestamp;
+  public String getToken() {
+    return token;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(timestamp);
+    return Objects.hash(token);
   }
 
   @Override
@@ -49,13 +41,11 @@ public class LogCursor {
     if (getClass() != obj.getClass())
       return false;
     LogCursor other = (LogCursor) obj;
-    return timestamp == other.timestamp;
+    return Objects.equals(token, other.token);
   }
 
   @Override
-  @JsonValue
   public String toString() {
-    return Base64.getUrlEncoder().encodeToString(
-        Long.toString(getTimestamp().toInstant().toEpochMilli()).getBytes(StandardCharsets.UTF_8));
+    return getToken();
   }
 }

@@ -27,6 +27,7 @@ paths:
           schema:
             type: integer
             format: int32
+            default: 10
         - name: cursor
           in: query
           description: The pagination cursor
@@ -105,6 +106,7 @@ paths:
           schema:
             type: integer
             format: int32
+            default: 10
         - name: cursor
           in: query
           description: The pagination cursor
@@ -187,6 +189,7 @@ paths:
           schema:
             type: integer
             format: int32
+            default: 10
         - name: cursor
           in: query
           description: The pagination cursor
@@ -266,6 +269,7 @@ paths:
           schema:
             type: string
             format: LogCursor
+            default: 10000
       responses:
         200:
           description: The execution was retrieved successfully.
@@ -521,6 +525,7 @@ components:
       schema:
         type: integer
         format: int32
+        default: 10
     
   schemas:
     # application/problem+json
