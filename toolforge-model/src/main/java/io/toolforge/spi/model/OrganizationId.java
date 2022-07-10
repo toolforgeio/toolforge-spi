@@ -4,6 +4,7 @@ import java.util.Comparator;
 import java.util.Objects;
 import java.util.regex.Pattern;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 import io.toolforge.spi.model.util.Nonces;
 
 public class OrganizationId implements Comparable<OrganizationId> {
@@ -55,11 +56,13 @@ public class OrganizationId implements Comparable<OrganizationId> {
   }
 
   @Override
+  @JsonValue
   public String toString() {
     return getText();
   }
 
-  public static final Comparator<OrganizationId> COMPARATOR = Comparator.comparing(OrganizationId::toString);
+  public static final Comparator<OrganizationId> COMPARATOR =
+      Comparator.comparing(OrganizationId::toString);
 
   @Override
   public int compareTo(OrganizationId that) {

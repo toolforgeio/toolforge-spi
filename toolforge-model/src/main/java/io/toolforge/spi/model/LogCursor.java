@@ -3,6 +3,7 @@ package io.toolforge.spi.model;
 import static java.util.Objects.requireNonNull;
 import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 public class LogCursor {
   @JsonCreator
@@ -45,6 +46,7 @@ public class LogCursor {
   }
 
   @Override
+  @JsonValue
   public String toString() {
     return getToken();
   }

@@ -4,6 +4,7 @@ import java.util.Comparator;
 import java.util.Objects;
 import java.util.regex.Pattern;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 import io.toolforge.spi.model.util.Nonces;
 
 public class BlobId implements Comparable<BlobId> {
@@ -55,6 +56,7 @@ public class BlobId implements Comparable<BlobId> {
   }
 
   @Override
+  @JsonValue
   public String toString() {
     return getText();
   }
