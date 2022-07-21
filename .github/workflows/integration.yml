@@ -1,0 +1,31 @@
+name: integration
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'corretto'
+      - name: Configure Maven
+        env:
+          MAVEN_SETTINGS: ${{ secrets.MAVEN_SETTINGS }}
+        run: mkdir -p ~/.m2 && echo "$MAVEN_SETTINGS" >~/.m2/settings.xml
+      - name: Cache local Maven repository
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+      - name: Run tests
+        run: mvn -B -Drevision= -Dchangelist= -Dsha1="$GITHUB_SHA" -Ddocker.skip=true clean compile test
