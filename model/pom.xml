@@ -3,12 +3,12 @@
 
     <parent>
         <groupId>io.toolforge</groupId>
-        <artifactId>toolforge-spi</artifactId>
+        <artifactId>spi</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>toolforge-model</artifactId>
-    <name>toolforge-model</name>
+    <artifactId>model</artifactId>
+    <name>model</name>
 
     <build>
         <plugins>

@@ -3,12 +3,12 @@
 
     <parent>
         <groupId>io.toolforge</groupId>
-        <artifactId>toolforge-spi</artifactId>
+        <artifactId>spi</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <artifactId>toolforge-service</artifactId>
-    <name>toolforge-service</name>
+    <artifactId>service</artifactId>
+    <name>service</name>
 
     <build>
         <plugins>
@@ -57,7 +57,7 @@
         </dependency>
         <dependency>
             <groupId>io.toolforge</groupId>
-            <artifactId>toolforge-model</artifactId>
+            <artifactId>model</artifactId>
             <version>${project.version}</version>
         </dependency>
     </dependencies>

@@ -2,9 +2,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>io.toolforge</groupId>
-    <artifactId>toolforge-spi</artifactId>
+    <artifactId>spi</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>toolforge-spi</name>
+    <name>spi</name>
     <inceptionYear>2022</inceptionYear>
     <description>Service Provider Interface for toolforge web processing API</description>
     <url>https://github.com/aleph0/toolforge-spi</url>
@@ -160,7 +160,7 @@
     </dependencyManagement>
 
     <modules>
-        <module>toolforge-model</module>
-        <module>toolforge-service</module>
+        <module>model</module>
+        <module>service</module>
     </modules>
 </project>
