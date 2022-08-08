@@ -86,6 +86,7 @@
                     <version>5.4.0</version>
                     <configuration>
                         <importMappings>
+                            <importMapping>AccountId=io.toolforge.spi.model.AccountId</importMapping>
                             <importMapping>BlobId=io.toolforge.spi.model.BlobId</importMapping>
                             <importMapping>DateExpr=io.toolforge.spi.model.DateExpr</importMapping>
                             <importMapping>ExecutionCursor=io.toolforge.spi.model.ExecutionCursor</importMapping>
@@ -98,6 +99,7 @@
                             <importMapping>ArgumentValue=io.toolforge.spi.model.ArgumentValue</importMapping>
                         </importMappings>
                         <typeMappings>
+                            <typeMapping>string+AccountId=AccountId</typeMapping>
                             <typeMapping>string+binary=InputStream</typeMapping>
                             <typeMapping>string+BlobId=BlobId</typeMapping>
                             <typeMapping>string+DateExpr=DateExpr</typeMapping>
