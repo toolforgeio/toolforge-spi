@@ -1,21 +1,22 @@
 package io.toolforge.spi.model;
 
+import static java.util.Objects.requireNonNull;
 import java.util.Comparator;
 import java.util.Objects;
-import java.util.regex.Pattern;
+import java.util.UUID;
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonValue;
-import io.toolforge.spi.model.util.Nonces;
 
 public class AccountId implements Comparable<AccountId> {
-  private static final Pattern PATTERN = Pattern.compile("^[0-9a-z]{8}$");
-
   public static AccountId generate() {
-    return of(Nonces.nonce36(8));
+    return of(UUID.randomUUID());
+  }
+
+  public static AccountId of(UUID id) {
+    return new AccountId(id);
   }
 
   public static AccountId of(String s) {
-    return new AccountId(s);
+    return of(UUID.fromString(s));
   }
 
   @JsonCreator
@@ -23,24 +24,22 @@ public class AccountId implements Comparable<AccountId> {
     return of(s);
   }
 
-  private final String text;
+  private final UUID uuid;
 
-  public AccountId(String text) {
-    if (!PATTERN.matcher(text).matches())
-      throw new IllegalArgumentException(text);
-    this.text = text;
+  public AccountId(UUID uuid) {
+    this.uuid = requireNonNull(uuid);
   }
 
   /**
    * @return the text
    */
-  private String getText() {
-    return text;
+  private UUID getUuid() {
+    return uuid;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(text);
+    return Objects.hash(uuid);
   }
 
   @Override
@@ -52,13 +51,12 @@ public class AccountId implements Comparable<AccountId> {
     if (getClass() != obj.getClass())
       return false;
     AccountId other = (AccountId) obj;
-    return Objects.equals(text, other.text);
+    return Objects.equals(uuid, other.uuid);
   }
 
   @Override
-  @JsonValue
   public String toString() {
-    return getText();
+    return getUuid().toString();
   }
 
   public static final Comparator<AccountId> COMPARATOR = Comparator.comparing(AccountId::toString);

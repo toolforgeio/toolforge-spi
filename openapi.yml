@@ -230,7 +230,7 @@ paths:
   /executions/{executionId}/cancel:
     parameters:
       - $ref: '#/components/parameters/executionId'
-    get:
+    post:
       tags:
         - execution
       summary: Cancel execution
@@ -545,6 +545,16 @@ components:
           type: string
         instance:
           type: string
+
+    Account:
+      type: object
+      properties:
+        id:
+          type: string
+          format: AccountId
+        email:
+          type: string
+          format: EmailAddress
           
     LogPage:
       type: object
