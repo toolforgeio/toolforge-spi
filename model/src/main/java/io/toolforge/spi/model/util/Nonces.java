@@ -8,7 +8,7 @@ public final class Nonces {
   private static final SecureRandom RANDOM = new SecureRandom();
 
   /**
-   * Generates a random base62 nonce string of the given length
+   * Generates a random base36 nonce string of the given length
    */
   public static String nonce36(int length) {
     if (length < 0)

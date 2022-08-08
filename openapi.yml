@@ -269,7 +269,6 @@ paths:
           schema:
             type: string
             format: LogCursor
-            default: 10000
       responses:
         200:
           description: The execution was retrieved successfully.
