@@ -8,11 +8,38 @@ info:
 servers:
   - url: https://api.toolforge.io/v1
 tags:
+  - name: account
+    description: Endpoints for manipulating accounts
   - name: tool
     description: Endpoints for manipulating tools
   - name: execution
     description: Endpoints for manipulating executions
 paths:
+  /accounts/{accountId}:
+    parameters:
+      - name: accountId
+        in: path
+        description: The ID of the account to retrieve, or "me"
+        required: true
+        schema:
+          type: string
+          format: AccountReference
+    get:
+      tags:
+        - account
+      summary: Get account
+      description: Get one account
+      operationId: getAccount
+      responses:
+        200:
+          description: The user was returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+        404:
+          $ref: '#/components/responses/NotFound'
+
   /tools:
     get:
       tags:

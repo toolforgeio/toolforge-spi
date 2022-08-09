@@ -5,6 +5,7 @@ import java.util.Comparator;
 import java.util.Objects;
 import java.util.UUID;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 
 public class AccountId implements Comparable<AccountId> {
   public static AccountId generate() {
@@ -55,6 +56,7 @@ public class AccountId implements Comparable<AccountId> {
   }
 
   @Override
+  @JsonValue
   public String toString() {
     return getUuid().toString();
   }
