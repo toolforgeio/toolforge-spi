@@ -1,21 +1,23 @@
 package io.toolforge.spi.model;
 
+import static java.util.Objects.requireNonNull;
 import java.util.Comparator;
 import java.util.Objects;
-import java.util.regex.Pattern;
+import java.util.UUID;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
-import io.toolforge.spi.model.util.Nonces;
 
 public class OrganizationId implements Comparable<OrganizationId> {
-  private static final Pattern PATTERN = Pattern.compile("^[0-9a-z]{8}$");
-
   public static OrganizationId generate() {
-    return of(Nonces.nonce36(8));
+    return of(UUID.randomUUID());
+  }
+
+  public static OrganizationId of(UUID id) {
+    return new OrganizationId(id);
   }
 
   public static OrganizationId of(String s) {
-    return new OrganizationId(s);
+    return of(UUID.fromString(s));
   }
 
   @JsonCreator
@@ -23,24 +25,26 @@ public class OrganizationId implements Comparable<OrganizationId> {
     return of(s);
   }
 
-  private final String text;
+  public static OrganizationId fromAccountId(AccountId accountId) {
+    return of(accountId.getUuid());
+  }
 
-  public OrganizationId(String text) {
-    if (!PATTERN.matcher(text).matches())
-      throw new IllegalArgumentException(text);
-    this.text = text;
+  private final UUID uuid;
+
+  public OrganizationId(UUID uuid) {
+    this.uuid = requireNonNull(uuid);
   }
 
   /**
    * @return the text
    */
-  private String getText() {
-    return text;
+  /* default */ UUID getUuid() {
+    return uuid;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(text);
+    return Objects.hash(uuid);
   }
 
   @Override
@@ -52,13 +56,13 @@ public class OrganizationId implements Comparable<OrganizationId> {
     if (getClass() != obj.getClass())
       return false;
     OrganizationId other = (OrganizationId) obj;
-    return Objects.equals(text, other.text);
+    return Objects.equals(uuid, other.uuid);
   }
 
   @Override
   @JsonValue
   public String toString() {
-    return getText();
+    return getUuid().toString();
   }
 
   public static final Comparator<OrganizationId> COMPARATOR =

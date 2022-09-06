@@ -25,6 +25,10 @@ public class AccountId implements Comparable<AccountId> {
     return of(s);
   }
 
+  public static AccountId fromOrganizationId(OrganizationId organizationId) {
+    return of(organizationId.getUuid());
+  }
+
   private final UUID uuid;
 
   public AccountId(UUID uuid) {
@@ -34,7 +38,7 @@ public class AccountId implements Comparable<AccountId> {
   /**
    * @return the text
    */
-  private UUID getUuid() {
+  /* default */ UUID getUuid() {
     return uuid;
   }
 
