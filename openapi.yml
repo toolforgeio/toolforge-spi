@@ -42,6 +42,32 @@ paths:
         404:
           $ref: '#/components/responses/NotFound'
 
+  /accounts/{accountId}/picture:
+    parameters:
+      - name: accountId
+        in: path
+        description: The ID of the account to retrieve, or "me"
+        required: true
+        schema:
+          type: string
+          format: AccountReference
+    get:
+      tags:
+        - account
+      summary: Get account profile picture
+      description: Get one account's profile picture
+      operationId: getAccountPicture
+      responses:
+        200:
+          description: The user was returned successfully
+          content:
+            image/jpeg:
+              schema:
+                type: string
+                format: binary
+        404:
+          $ref: '#/components/responses/NotFound'
+
   /tools:
     get:
       tags:
@@ -781,6 +807,9 @@ components:
         - id
         - owner
         - createdAt
+        - name
+        - description
+        - slug
       properties:
         id:
           type: string
@@ -804,6 +833,8 @@ components:
           type: string
           format: date-time
         name:
+          type: string
+        slug:
           type: string
         description:
           type: string
@@ -1118,6 +1149,8 @@ components:
         version:
           type: string
           format: VersionId
+        name:
+          type: string
           
     ExecutionPage:
       type: object
@@ -1144,10 +1177,22 @@ components:
           format: ExecutionId
         tool:
           $ref: '#/components/schemas/ToolReference'
+        owner:
+          type: string
+          format: AccountId
         name:
           type: string
         state:
           $ref: '#/components/schemas/ExecutionState'
+        createdAt:
+          type: string
+          format: date-time
+        startedAt:
+          type: string
+          format: date-time
+        finishedAt:
+          type: string
+          format: date-time
 
     # TODO How do we represent inputs? status?
     # TODO How do we represent outputs? status?
