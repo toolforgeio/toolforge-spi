@@ -50,6 +50,18 @@ paths:
       description: List one page of tools
       operationId: listTools
       parameters:
+        - name: q
+          in: query
+          description: A keyword query to filter tool
+          schema:
+            type: string
+            format: KeywordQuery
+            example: twitter account
+        - name: order
+          in: query
+          description: The order in which tools should be returned
+          schema:
+            $ref: '#/components/schemas/ToolListOrdering'
         - name: limit
           in: query
           description: The maximum number of tools to return per page
@@ -57,6 +69,8 @@ paths:
             type: integer
             format: int32
             default: 10
+            minimum: 0
+            maximum: 100
         - name: cursor
           in: query
           description: The pagination cursor
@@ -236,6 +250,23 @@ paths:
       description: List one page of executions
       operationId: listExecutions
       parameters:
+        - name: q
+          in: query
+          description: A keyword query for filtering executions
+          schema:
+            type: string
+            format: KeywordQuery
+            example: twitter account
+        - name: scope
+          in: query
+          description: The scope of executions to return
+          schema:
+            $ref: '#/components/schemas/ExecutionListScope'
+        - name: state
+          in: query
+          description: The state of executions to return
+          schema:
+            $ref: '#/components/schemas/ExecutionState'
         - name: limit
           in: query
           description: The maximum number of executions to return per page
@@ -243,6 +274,8 @@ paths:
             type: integer
             format: int32
             default: 10
+            minimum: 0
+            maximum: 100
         - name: cursor
           in: query
           description: The pagination cursor
@@ -538,6 +571,12 @@ components:
         application/problem+json:
           schema:
             $ref: '#/components/schemas/ErrorMessage'
+    Conflict:
+      description: The request conflicts with application state.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ErrorMessage'
     Gone:
       description: The object has expired.
       content:
@@ -728,7 +767,14 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ToolOutput'
-          
+            
+    ToolListOrdering:
+      type: string
+      enum:
+        - lastExecutedByOrganizationAt
+        - lastExecutedByMeAt
+        - name
+
     ToolPreview:
       type: object
       required:
@@ -749,6 +795,12 @@ components:
           type: string
           format: date-time
         updatedAt:
+          type: string
+          format: date-time
+        lastExecutedByMeAt:
+          type: string
+          format: date-time
+        lastExecutedByOrganizationAt:
           type: string
           format: date-time
         name:
@@ -1077,6 +1129,12 @@ components:
         cursor:
           type: string
           format: ExecutionCursor
+          
+    ExecutionListScope:
+      type: string
+      enum:
+        - organization
+        - me
           
     ExecutionPreview:
       type: object

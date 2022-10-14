@@ -98,6 +98,7 @@
                             <importMapping>ToolVersion=io.toolforge.spi.model.ToolVersion</importMapping>
                             <importMapping>InputStream=java.io.InputStream</importMapping>
                             <importMapping>ArgumentValue=io.toolforge.spi.model.ArgumentValue</importMapping>
+                            <importMapping>KeywordQuery=io.toolforge.spi.model.KeywordQuery</importMapping>
                         </importMappings>
                         <typeMappings>
                             <typeMapping>string+AccountId=AccountId</typeMapping>
@@ -112,6 +113,7 @@
                             <typeMapping>string+ToolCursor=ToolCursor</typeMapping>
                             <typeMapping>string+ToolId=ToolId</typeMapping>
                             <typeMapping>string+VersionId=ToolVersion</typeMapping>
+                            <typeMapping>string+KeywordQuery=KeywordQuery</typeMapping>
                         </typeMappings>
                     </configuration>
                     <executions>
