@@ -787,6 +787,15 @@ components:
         email:
           type: string
           format: EmailAddress
+        createdAt:
+          type: string
+          format: date-time
+        lastLoginAt:
+          type: string
+          format: date-time
+        lastExecutionAt:
+          type: string
+          format: date-time
         picture:
           type: string
           format: url
@@ -799,7 +808,9 @@ components:
     AccountListOrdering:
       type: string
       enum:
-        - lastExecution
+        - lastExecutionAt
+        - lastLoginAt
+        - createdAt
         - username
 
     AccountPage:
