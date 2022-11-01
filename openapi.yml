@@ -376,11 +376,12 @@ paths:
             type: string
             format: KeywordQuery
             example: twitter account
-        - name: scope
+        - name: owner
           in: query
-          description: The scope of executions to return
+          description: The owner of executions to return
           schema:
-            $ref: '#/components/schemas/ExecutionListScope'
+            type: string
+            format: AccountReference
         - name: state
           in: query
           description: The state of executions to return
@@ -1294,12 +1295,6 @@ components:
         cursor:
           type: string
           format: ExecutionCursor
-          
-    ExecutionListScope:
-      type: string
-      enum:
-        - team
-        - me
           
     ExecutionPreview:
       type: object
