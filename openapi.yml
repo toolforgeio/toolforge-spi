@@ -17,9 +17,47 @@ tags:
   - name: docker
     description: Endpoints for managing Docker integration
 paths:
-  /accounts/{accountId}:
+  /accounts:
+    get:
+      tags:
+        - account
+      summary: List accounts
+      description: List accounts one page at a time
+      operationId: listAccounts
+      parameters:
+        - name: q
+          in: query
+          description: A prefix query to filter accounts
+          schema:
+            type: string
+            format: PrefixQuery
+            example: bbaggins
+        - name: limit
+          in: query
+          description: The maximum number of accounts to return per page
+          schema:
+            type: integer
+            format: int32
+            minimum: 0
+            maximum: 100
+            default: 10
+        - name: cursor
+          in: query
+          description: The pagination cursor
+          schema:
+            type: string
+            format: AccountCursor
+      responses:
+        200:
+          description: The user list was returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountPage'
+
+  /accounts/{accountReference}:
     parameters:
-      - name: accountId
+      - name: accountReference
         in: path
         description: The ID of the account to retrieve, or "me"
         required: true
@@ -42,9 +80,59 @@ paths:
         404:
           $ref: '#/components/responses/NotFound'
 
-  /accounts/{accountId}/picture:
+  /accounts/by/id/{accountId}:
     parameters:
       - name: accountId
+        in: path
+        description: The ID of the account to retrieve
+        required: true
+        schema:
+          type: string
+          format: AccountId
+    get:
+      tags:
+        - account
+      summary: Get account by ID
+      description: Get one account by ID
+      operationId: getAccountById
+      responses:
+        200:
+          description: The user was returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+  /accounts/by/username/{accountUsername}:
+    parameters:
+      - name: accountUsername
+        in: path
+        description: The username of the account to retrieve
+        required: true
+        schema:
+          type: string
+          format: AccountUsername
+    get:
+      tags:
+        - account
+      summary: Get account by username
+      description: Get one account by username
+      operationId: getAccountByUsername
+      responses:
+        200:
+          description: The user was returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Account'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+  /accounts/{accountReference}/picture:
+    parameters:
+      - name: accountReference
         in: path
         description: The ID of the account to retrieve, or "me"
         required: true
@@ -681,7 +769,7 @@ components:
         instance:
           type: string
 
-    Account:
+    AccountPreview:
       type: object
       properties:
         id:
@@ -694,7 +782,29 @@ components:
         email:
           type: string
           format: EmailAddress
+        picture:
+          type: string
+          format: url
           
+    Account:
+      allOf:
+        - $ref: '#/components/schemas/AccountPreview'
+        - type: object
+          
+    AccountPage:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/AccountPreview'
+        total:
+          type: integer
+          format: int32
+        cursor:
+          type: string
+          format: AccountCursor
+
     LogPage:
       type: object
       required:
