@@ -810,7 +810,7 @@ components:
       type: string
       enum:
         - lastExecutionAt
-        - lastActiveAt
+        - activeAt
         - createdAt
         - username
 
