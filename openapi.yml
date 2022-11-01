@@ -797,7 +797,7 @@ components:
     ToolListOrdering:
       type: string
       enum:
-        - lastExecutedByOrganizationAt
+        - lastExecutedByTeamAt
         - lastExecutedByMeAt
         - name
 
@@ -829,7 +829,7 @@ components:
         lastExecutedByMeAt:
           type: string
           format: date-time
-        lastExecutedByOrganizationAt:
+        lastExecutedByTeamAt:
           type: string
           format: date-time
         name:
@@ -1166,7 +1166,7 @@ components:
     ExecutionListScope:
       type: string
       enum:
-        - organization
+        - team
         - me
           
     ExecutionPreview:
