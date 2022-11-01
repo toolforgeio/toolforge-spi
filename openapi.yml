@@ -47,6 +47,11 @@ paths:
           schema:
             type: string
             format: AccountCursor
+        - name: order
+          in: query
+          description: The order in which records are returned
+          schema:
+            $ref: '#/components/schemas/AccountListOrdering'
       responses:
         200:
           description: The user list was returned successfully
@@ -791,6 +796,12 @@ components:
         - $ref: '#/components/schemas/AccountPreview'
         - type: object
           
+    AccountListOrdering:
+      type: string
+      enum:
+        - lastExecution
+        - username
+
     AccountPage:
       type: object
       properties:
