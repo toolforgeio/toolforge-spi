@@ -88,6 +88,7 @@
                         <importMappings>
                             <importMapping>AccountId=io.toolforge.spi.model.AccountId</importMapping>
                             <importMapping>AccountReference=io.toolforge.spi.model.AccountReference</importMapping>
+                            <importMapping>AccountCursor=io.toolforge.spi.model.AccountCursor</importMapping>
                             <importMapping>BlobId=io.toolforge.spi.model.BlobId</importMapping>
                             <importMapping>DateExpr=io.toolforge.spi.model.DateExpr</importMapping>
                             <importMapping>ExecutionCursor=io.toolforge.spi.model.ExecutionCursor</importMapping>
@@ -99,10 +100,12 @@
                             <importMapping>InputStream=java.io.InputStream</importMapping>
                             <importMapping>ArgumentValue=io.toolforge.spi.model.ArgumentValue</importMapping>
                             <importMapping>KeywordQuery=io.toolforge.spi.model.KeywordQuery</importMapping>
+                            <importMapping>PrefixQuery=io.toolforge.spi.model.PrefixQuery</importMapping>
                         </importMappings>
                         <typeMappings>
                             <typeMapping>string+AccountId=AccountId</typeMapping>
                             <typeMapping>string+AccountReference=AccountReference</typeMapping>
+                            <typeMapping>string+AccountCursor=AccountCursor</typeMapping>
                             <typeMapping>string+binary=InputStream</typeMapping>
                             <typeMapping>string+BlobId=BlobId</typeMapping>
                             <typeMapping>string+DateExpr=DateExpr</typeMapping>
@@ -114,6 +117,7 @@
                             <typeMapping>string+ToolId=ToolId</typeMapping>
                             <typeMapping>string+VersionId=ToolVersion</typeMapping>
                             <typeMapping>string+KeywordQuery=KeywordQuery</typeMapping>
+                            <typeMapping>string+PrefixQuery=PrefixQuery</typeMapping>
                         </typeMappings>
                     </configuration>
                     <executions>

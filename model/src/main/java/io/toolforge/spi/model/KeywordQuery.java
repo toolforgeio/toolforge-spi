@@ -24,6 +24,8 @@ public class KeywordQuery {
   private final List<String> tokens;
 
   public KeywordQuery(List<String> tokens) {
+    if (!tokens.stream().allMatch(s -> TOKEN_PATTERN.matcher(s).matches()))
+      throw new IllegalArgumentException("invalid tokens: " + tokens);
     this.tokens = unmodifiableList(tokens);
   }
 
