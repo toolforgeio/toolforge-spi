@@ -791,7 +791,7 @@ components:
         createdAt:
           type: string
           format: date-time
-        lastLoginAt:
+        activeAt:
           type: string
           format: date-time
         lastExecutionAt:
@@ -810,7 +810,7 @@ components:
       type: string
       enum:
         - lastExecutionAt
-        - lastLoginAt
+        - lastActiveAt
         - createdAt
         - username
 
