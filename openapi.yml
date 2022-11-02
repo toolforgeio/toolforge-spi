@@ -831,9 +831,9 @@ components:
     LogPage:
       type: object
       required:
-      - entries
+      - items
       properties:
-        entries:
+        items:
           type: array
           items:
             $ref: '#/components/schemas/LogEntry'
@@ -1288,7 +1288,7 @@ components:
     ExecutionPage:
       type: object
       properties:
-        entries:
+        items:
           type: array
           items:
             $ref: '#/components/schemas/ExecutionPreview'
