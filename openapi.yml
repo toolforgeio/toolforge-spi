@@ -917,7 +917,7 @@ components:
         parameters:
           type: array
           items:
-            $ref: '#/components/schemas/Parameter'
+            $ref: '#/components/schemas/ParameterDefinition'
         inputs:
           type: array
           items:
@@ -1043,6 +1043,50 @@ components:
           type: string
           format: ToolCursor
 
+    StringDomainType:
+      type: string
+      enum:
+        - pattern
+        - enumeration
+              
+    StringDomain:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/StringDomainType'
+      required:
+        - type
+      discriminator:
+        propertyName: type
+        mapping:
+          pattern: PatternStringDomain
+          enumeration: EnumerationStringDomain
+          
+    PatternStringDomain:
+      allOf:
+        - $ref: '#/components/schemas/StringDomain'
+        - type: object
+          required:
+            - pattern
+          properties:
+            pattern:
+              type: string
+              format: regex
+    
+    EnumerationStringDomain:
+      allOf:
+        - $ref: '#/components/schemas/StringDomain'
+        - type: object
+          required:
+            - values
+          properties:
+            values:
+              type: array
+              uniqueItems: true
+              minItems: 1
+              items:
+                type: string
+
     ParameterType:
       type: string
       enum:
@@ -1052,6 +1096,109 @@ components:
         - date
         - boolean
         
+    ParameterDefinition:
+      type: object
+      required:
+        - type
+        - name
+        - description
+        - required
+      properties:
+        type:
+          $ref: '#/components/schemas/ParameterType'
+        name:
+          type: string
+          pattern: '^[a-zA-Z][a-zA-Z0-9]*'
+          maxLength: 64
+        description:
+          type: string
+        required:
+          type: boolean
+          default: true
+      discriminator:
+        propertyName: type
+        mapping:
+          int: IntParameterDefinition
+          float: FloatParameterDefinition
+          string: StringParameterDefinition
+          date: DateParameterDefinition
+          boolean: BooleanParameterDefinition
+          
+    IntParameterDefinition:
+      allOf:
+        - $ref: '#/components/schemas/ParameterDefinition'
+        - type: object
+          required:
+            - minimum
+            - maximum
+          properties:
+            minimum:
+              type: integer
+              format: int64
+            maximum:
+              type: integer
+              format: int64
+            default:
+              type: integer
+              format: int64
+
+    FloatParameterDefinition:
+      allOf:
+        - $ref: '#/components/schemas/ParameterDefinition'
+        - type: object
+          required:
+            - minimum
+            - maximum
+          properties:
+            minimum:
+              type:  number
+              format: double
+            maximum:
+              type: number
+              format: double
+            default:
+              type: number
+              format: double
+
+    StringParameterDefinition:
+      allOf:
+        - $ref: '#/components/schemas/ParameterDefinition'
+        - type: object
+          required:
+            - domain
+            - default
+          properties:
+            domain:
+              $ref: '#/components/schemas/StringDomain'
+            default:
+              type: string
+                
+    DateParameterDefinition:
+      allOf:
+        - $ref: '#/components/schemas/ParameterDefinition'
+        - type: object
+          required:
+            - minimum
+            - maximum
+          properties:
+            minimum:
+              type: string
+              format: DateExpr
+            maximum:
+              type: string
+              format: DateExpr
+            default:
+              type: string
+              format: DateExpr
+        
+    BooleanParameterDefinition:
+      allOf:
+        - $ref: '#/components/schemas/ParameterDefinition'
+        - type: object
+          properties:
+            default:
+              type: boolean
+            
     Parameter:
       type: object
       required:
@@ -1110,50 +1257,6 @@ components:
               type: number
               format: double
 
-    StringDomainType:
-      type: string
-      enum:
-        - pattern
-        - enumeration
-              
-    StringDomain:
-      type: object
-      properties:
-        type:
-          $ref: '#/components/schemas/StringDomainType'
-      required:
-        - type
-      discriminator:
-        propertyName: type
-        mapping:
-          pattern: PatternStringDomain
-          enumeration: EnumerationStringDomain
-          
-    PatternStringDomain:
-      allOf:
-        - $ref: '#/components/schemas/StringDomain'
-        - type: object
-          required:
-            - pattern
-          properties:
-            pattern:
-              type: string
-              format: regex
-    
-    EnumerationStringDomain:
-      allOf:
-        - $ref: '#/components/schemas/StringDomain'
-        - type: object
-          required:
-            - values
-          properties:
-            values:
-              type: array
-              uniqueItems: true
-              minItems: 1
-              items:
-                type: string
-
     StringParameter:
       allOf:
         - $ref: '#/components/schemas/Parameter'
@@ -1173,13 +1276,13 @@ components:
           properties:
             minimum:
               type: string
-              format: DateExpr
+              format: date
             maximum:
               type: string
-              format: DateExpr
+              format: date
             default:
               type: string
-              format: DateExpr
+              format: date
         
     BooleanParameter:
       allOf:
