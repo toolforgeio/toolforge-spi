@@ -777,34 +777,48 @@ components:
 
     AccountPreview:
       type: object
+      required:
+        - id
+        - username
       properties:
         id:
           type: string
           format: AccountId
-        name:
-          type: string
         username:
           type: string
-        email:
-          type: string
-          format: EmailAddress
-        createdAt:
-          type: string
-          format: date-time
-        activeAt:
-          type: string
-          format: date-time
-        lastExecutionAt:
-          type: string
-          format: date-time
-        picture:
-          type: string
-          format: url
-          
-    Account:
+          format: AccountUsername
+
+    AccountDescription:
       allOf:
         - $ref: '#/components/schemas/AccountPreview'
         - type: object
+          required:
+            - createdAt
+            - picture
+          properties:
+            name:
+              type: string
+            email:
+              type: string
+              format: EmailAddress
+            createdAt:
+              type: string
+              format: date-time
+            activeAt:
+              type: string
+              format: date-time
+            lastExecutionAt:
+              type: string
+              format: date-time
+            picture:
+              type: string
+              format: url
+          
+    Account:
+      allOf:
+        - $ref: '#/components/schemas/AccountDescription'
+        - type: object
+          properties: {}
           
     AccountListOrdering:
       type: string
@@ -820,7 +834,7 @@ components:
         items:
           type: array
           items:
-            $ref: '#/components/schemas/AccountPreview'
+            $ref: '#/components/schemas/AccountDescription'
         total:
           type: integer
           format: int32
@@ -939,9 +953,7 @@ components:
       required:
         - id
         - owner
-        - createdAt
         - name
-        - description
         - slug
       properties:
         id:
@@ -951,31 +963,39 @@ components:
           type: string
           format: VersionId
         owner:
-          type: string
-          format: AccountId
-        createdAt:
-          type: string
-          format: date-time
-        updatedAt:
-          type: string
-          format: date-time
-        lastExecutedByMeAt:
-          type: string
-          format: date-time
-        lastExecutedByTeamAt:
-          type: string
-          format: date-time
+          $ref: '#/components/schemas/AccountPreview'
         name:
           type: string
         slug:
           type: string
-        description:
-          type: string
-          format: markdown
+      
+    ToolDescription:
+      allOf:
+        - $ref: '#/components/schemas/ToolPreview'
+        - type: object
+          required:
+            - createdAt
+            - description
+          properties:
+            createdAt:
+              type: string
+              format: date-time
+            updatedAt:
+              type: string
+              format: date-time
+            lastExecutedByMeAt:
+              type: string
+              format: date-time
+            lastExecutedByTeamAt:
+              type: string
+              format: date-time
+            description:
+              type: string
+              format: markdown
 
     Tool:
       allOf:
-        - $ref: '#/components/schemas/ToolPreview'
+        - $ref: '#/components/schemas/ToolDescription'
         - type: object
           properties:
             parameters:
@@ -1035,7 +1055,7 @@ components:
         items:
           type: array
           items:
-            $ref: '#/components/schemas/ToolPreview'
+            $ref: '#/components/schemas/ToolDescription'
         total:
           type: integer
           format: int32
@@ -1373,43 +1393,16 @@ components:
         # The execution was cancelled by the user.
         - cancelled
         
-    ToolReference:
-      type: object
-      required:
-        - id
-        - version
-      properties:
-        id:
-          type: string
-          format: ToolId
-        version:
-          type: string
-          format: VersionId
-        name:
-          type: string
-          
-    ExecutionPage:
-      type: object
-      properties:
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/ExecutionPreview'
-        cursor:
-          type: string
-          format: ExecutionCursor
-          
-    ExecutionPreview:
+    ExecutionDescription:
       type: object
       properties:
         id:
           type: string
           format: ExecutionId
         tool:
-          $ref: '#/components/schemas/ToolReference'
+          $ref: '#/components/schemas/ToolPreview'
         owner:
-          type: string
-          format: AccountId
+          $ref: '#/components/schemas/AccountPreview'
         name:
           type: string
         state:
@@ -1424,11 +1417,22 @@ components:
           type: string
           format: date-time
 
+    ExecutionPage:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExecutionDescription'
+        cursor:
+          type: string
+          format: ExecutionCursor
+          
     # TODO How do we represent inputs? status?
     # TODO How do we represent outputs? status?
     Execution:
       allOf:
-        - $ref: '#/components/schemas/ExecutionPreview'
+        - $ref: '#/components/schemas/ExecutionDescription'
         - type: object
           properties:
             arguments:
