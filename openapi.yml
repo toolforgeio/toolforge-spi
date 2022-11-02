@@ -780,6 +780,7 @@ components:
       required:
         - id
         - username
+        - picture
       properties:
         id:
           type: string
@@ -787,6 +788,9 @@ components:
         username:
           type: string
           format: AccountUsername
+        picture:
+          type: string
+          format: url
 
     AccountDescription:
       allOf:
@@ -794,7 +798,6 @@ components:
         - type: object
           required:
             - createdAt
-            - picture
           properties:
             name:
               type: string
@@ -810,9 +813,6 @@ components:
             lastExecutionAt:
               type: string
               format: date-time
-            picture:
-              type: string
-              format: url
           
     Account:
       allOf:
@@ -977,6 +977,9 @@ components:
             - createdAt
             - description
           properties:
+            description:
+              type: string
+              format: markdown
             createdAt:
               type: string
               format: date-time
@@ -989,9 +992,6 @@ components:
             lastExecutedByTeamAt:
               type: string
               format: date-time
-            description:
-              type: string
-              format: markdown
 
     Tool:
       allOf:
@@ -1151,6 +1151,7 @@ components:
           required:
             - minimum
             - maximum
+            - default
           properties:
             minimum:
               type: integer
@@ -1169,6 +1170,7 @@ components:
           required:
             - minimum
             - maximum
+            - default
           properties:
             minimum:
               type:  number
@@ -1200,6 +1202,7 @@ components:
           required:
             - minimum
             - maximum
+            - default
           properties:
             minimum:
               type: string
@@ -1215,6 +1218,8 @@ components:
       allOf:
         - $ref: '#/components/schemas/ParameterDefinition'
         - type: object
+          required:
+            - default
           properties:
             default:
               type: boolean
