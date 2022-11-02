@@ -7,9 +7,9 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public class PrefixQuery {
-  public static PrefixQuery EMPTY = PrefixQuery.of("");
-
   private static final Pattern PATTERN = Pattern.compile("^\\w*$");
+
+  public static PrefixQuery EMPTY = PrefixQuery.of("");
 
   @JsonCreator
   public static PrefixQuery fromString(String s) {
