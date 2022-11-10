@@ -478,6 +478,17 @@ paths:
           $ref: '#/components/responses/NotFound'
         410:
           $ref: '#/components/responses/Gone'
+    delete:
+      tags:
+        - execution
+      summary: Delete execution
+      description: Delete an execution by ID
+      operationId: deleteExecution
+      responses:
+        204:
+          description: The execution was deleted successfully.
+        403:
+          $ref: '#/components/responses/Forbidden'
 
   /executions/{executionId}/cancel:
     parameters:
