@@ -4,7 +4,7 @@ info:
   description: ToolForge is the self-serve tools platform for teams
   contact:
     email: api@toolforge.io
-  version: 0.0.0
+  version: 0.0.17
 servers:
   - url: https://api.toolforge.io/v1
 tags:
@@ -248,6 +248,28 @@ paths:
           $ref: '#/components/responses/Forbidden'
         404:
           $ref: '#/components/responses/NotFound'
+    patch:
+      tags:
+        - tool
+      summary: Get tool
+      description: Update metadata about one tool
+      operationId: updateTool
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/ToolUpdate'
+      responses:
+        200:
+          description: The tool was updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tool'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        404:
+          $ref: '#/components/responses/NotFound'
 
   /tools/{toolId}/execute:
     parameters:
@@ -422,6 +444,30 @@ paths:
       responses:
         200:
           description: The execution was retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Execution'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        404:
+          $ref: '#/components/responses/NotFound'
+        410:
+          $ref: '#/components/responses/Gone'
+    patch:
+      tags:
+        - execution
+      summary: Update execution
+      description: Update metadata about one execution
+      operationId: updateExecution
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/ExecutionUpdate'
+      responses:
+        200:
+          description: The execution was updated successfully.
           content:
             application/json:
               schema:
@@ -948,6 +994,18 @@ components:
         - lastExecutedByMeAt
         - name
 
+    ToolUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+          format: markdown
+        owner:
+          type: string
+          format: AccountId
+
     ToolPreview:
       type: object
       required:
@@ -1397,7 +1455,16 @@ components:
         - failed
         # The execution was cancelled by the user.
         - cancelled
-        
+
+    ExecutionUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        owner:
+          type: string
+          format: AccountId
+
     ExecutionDescription:
       type: object
       properties:
