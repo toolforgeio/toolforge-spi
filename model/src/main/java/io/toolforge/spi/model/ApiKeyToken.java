@@ -14,7 +14,7 @@ public class ApiKeyToken {
   private static final Pattern PATTERN = Pattern.compile("^[a-zA-Z0-9]{" + LENGTH + "}$");
 
   public static ApiKeyToken generate() {
-    return of(new StringBuilder().append(PREFIX).append(Nonces.nonce62(LENGTH)).toString());
+    return of(Nonces.nonce62(LENGTH));
 
   }
 

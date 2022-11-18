@@ -92,6 +92,7 @@
                             <importMapping>ApiKeyCursor=io.toolforge.spi.model.ApiKeyCursor</importMapping>
                             <importMapping>ApiKeyHint=io.toolforge.spi.model.ApiKeyHint</importMapping>
                             <importMapping>ApiKeyId=io.toolforge.spi.model.ApiKeyId</importMapping>
+                            <importMapping>ApiKeyToken=io.toolforge.spi.model.ApiKeyToken</importMapping>
                             <importMapping>BlobId=io.toolforge.spi.model.BlobId</importMapping>
                             <importMapping>DateExpr=io.toolforge.spi.model.DateExpr</importMapping>
                             <importMapping>ExecutionCursor=io.toolforge.spi.model.ExecutionCursor</importMapping>
@@ -112,6 +113,7 @@
                             <typeMapping>string+ApiKeyCursor=ApiKeyCursor</typeMapping>
                             <typeMapping>string+ApiKeyHint=ApiKeyHint</typeMapping>
                             <typeMapping>string+ApiKeyId=ApiKeyId</typeMapping>
+                            <typeMapping>string+ApiKeyToken=ApiKeyToken</typeMapping>
                             <typeMapping>string+binary=InputStream</typeMapping>
                             <typeMapping>string+BlobId=BlobId</typeMapping>
                             <typeMapping>string+DateExpr=DateExpr</typeMapping>
