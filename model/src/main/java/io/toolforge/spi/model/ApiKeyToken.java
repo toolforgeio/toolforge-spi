@@ -9,7 +9,7 @@ import io.toolforge.spi.model.util.Nonces;
 public class ApiKeyToken {
   private static final int LENGTH = 36;
 
-  private static final String PREFIX = "tfk_";
+  public static final String PREFIX = "tfk_";
 
   private static final Pattern PATTERN = Pattern.compile("^[a-zA-Z0-9]{" + LENGTH + "}$");
 
