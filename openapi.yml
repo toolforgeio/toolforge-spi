@@ -85,6 +85,114 @@ paths:
         404:
           $ref: '#/components/responses/NotFound'
 
+  /accounts/{accountReference}/apiKeys:
+    parameters:
+      - name: accountReference
+        in: path
+        description: The ID of the account to retrieve, or "me"
+        required: true
+        schema:
+          type: string
+          format: AccountReference
+    get:
+      tags:
+        - account
+      summary: List account's API keys
+      description: List one account's API keys one page at a time. Users can only retrieve their own API keys.
+      operationId: listAccountApiKeys
+      parameters:
+        - name: limit
+          in: query
+          description: The maximum number of API keys to return per page
+          schema:
+            type: integer
+            format: int32
+            default: 10
+            minimum: 0
+            maximum: 10
+        - name: cursor
+          in: query
+          description: The pagination cursor
+          schema:
+            type: string
+            format: ApiKeyCursor
+      responses:
+        200:
+          description: The API keys were returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiKeyPage'
+        403:
+          $ref: '#/components/responses/Forbidden'
+    post:
+      tags:
+        - account
+      summary: Create API key
+      description: Create a new API key for the given account. Users can only create new API keys for their own accounts. Each account can have up to 10 API keys.
+      operationId: createAccountApiKey
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/ApiKeyDefinition'
+      responses:
+        200:
+          description: The API key was created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiKey'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        409:
+          $ref: '#/components/responses/Conflict'
+
+  /accounts/{accountReference}/apiKeys/{apiKeyId}:
+    parameters:
+      - name: accountReference
+        in: path
+        description: The ID of the account to retrieve, or "me"
+        required: true
+        schema:
+          type: string
+          format: AccountReference
+      - name: apiKeyId
+        in: path
+        description: The ID of the API key to retrieve
+        required: true
+        schema:
+          type: string
+          format: ApiKeyId
+    get:
+      tags:
+        - account
+      summary: Get API key
+      description: Get one API key. Users can only retrieve API keys for their own accounts.
+      operationId: getAccountApiKey
+      responses:
+        200:
+          description: The API key was returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiKey'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        404:
+          $ref: '#/components/responses/NotFound'
+    delete:
+      tags:
+        - account
+      summary: Delete API key
+      description: Delete an API key from the given account. Users can only delete API keys from their own accounts.
+      operationId: deleteAccountApiKey
+      responses:
+        204:
+          description: The API key was deleted successfully
+        403:
+          $ref: '#/components/responses/Forbidden'
+
   /accounts/by/id/{accountId}:
     parameters:
       - name: accountId
@@ -971,6 +1079,66 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ManifestEnvironmentVariable'
+
+    ApiKeyDescription:
+      type: object
+      required:
+        - id
+        - description
+        - createdAt
+      properties:
+        id:
+          type: string
+          format: ApiKeyId
+          minLength: 64
+          maxLength: 64
+        description:
+          type: string
+          minLength: 1
+          maxLength: 80
+        createdAt:
+          type: string
+          format: date-time
+        activeAt:
+          type: string
+          format: date-time
+
+    ApiKey:
+      allOf:
+        - $ref: '#/components/schemas/ApiKeyDescription'
+        - type: object
+          required:
+            - hint
+          properties:
+            hint:
+              type: string
+              format: ApiKeyHint
+              minLength: 4
+              maxLength: 4
+
+    ApiKeyDefinition:
+      type: object
+      required:
+        - description
+      properties:
+        description:
+          type: string
+          minLength: 1
+          maxLength: 80
+          
+    ApiKeyPage:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApiKeyDescription'
+        total:
+          type: integer
+          format: int32
+        cursor:
+          type: string
+          format: ApiKeyCursor
 
     Manifest:
       type: object
