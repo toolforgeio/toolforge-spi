@@ -19,7 +19,10 @@ public class ApiKeyHint {
   }
 
   @JsonCreator
-  public static ApiKeyHint fromString(String text) {
+  public static ApiKeyHint fromString(String s) {
+    if (!s.startsWith(ApiKeyToken.PREFIX))
+      throw new IllegalArgumentException("invalid api key hint");
+    String text = s.substring(ApiKeyToken.PREFIX.length(), s.length());
     return of(text);
   }
 
@@ -62,6 +65,6 @@ public class ApiKeyHint {
   @Override
   @JsonValue
   public String toString() {
-    return getText();
+    return ApiKeyToken.PREFIX + getText();
   }
 }
