@@ -1049,11 +1049,40 @@ components:
       type: object
       required:
         - name
-        - value
+        - required
+        - description
       properties:
         name:
           type: string
-        value:
+          pattern: '^[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)*'
+          minLength: 1
+          maxLength: 64
+        description:
+          type: string
+          format: markdown
+        required:
+          type: boolean
+        default:
+          type: string
+
+    ManifestEnvironmentSecret:
+      type: object
+      required:
+        - name
+        - required
+        - description
+      properties:
+        name:
+          type: string
+          pattern: '^[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)*'
+          minLength: 1
+          maxLength: 64
+        description:
+          type: string
+          format: markdown
+        required:
+          type: boolean
+        example:
           type: string
 
     ManifestEnvironmentSize:
@@ -1077,8 +1106,16 @@ components:
           $ref: '#/components/schemas/ManifestEnvironmentSize'
         variables:
           type: array
+          minLength: 0
+          maxLength: 10
           items:
             $ref: '#/components/schemas/ManifestEnvironmentVariable'
+        secrets:
+          type: array
+          minLength: 0
+          maxLength: 10
+          items:
+            $ref: '#/components/schemas/ManifestEnvironmentSecret'
 
     ApiKeyDescription:
       type: object
@@ -1273,6 +1310,7 @@ components:
           maxLength: 64
         description:
           type: string
+          format: markdown
         extensions:
           type: array
           uniqueItems: true
@@ -1291,6 +1329,7 @@ components:
           type: string
         description:
           type: string
+          format: markdown
         extensions:
           type: array
           uniqueItems: true
@@ -1382,6 +1421,7 @@ components:
           maxLength: 64
         description:
           type: string
+          format: markdown
         required:
           type: boolean
           default: true
