@@ -16,9 +16,9 @@
     </organization>
 
     <scm>
-        <connection>scm:git:ssh://git@github.com/toolforgeio/toolforge4j.git</connection>
-        <developerConnection>scm:git:ssh://git@github.com/toolforgeio/toolforge4j.git</developerConnection>
-        <url>https://github.com/toolforgeio/toolforge4j/tree/main</url>
+        <connection>scm:git:ssh://git@github.com/toolforgeio/toolforge-spi.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/toolforgeio/toolforge-spi.git</developerConnection>
+        <url>https://github.com/toolforgeio/toolforge-spi/tree/main</url>
       <tag>HEAD</tag>
   </scm>
 
@@ -51,7 +51,7 @@
 
     <issueManagement>
         <system>GitHub</system>
-        <url>https://github.com/toolforgeio/toolforge4j</url>
+        <url>https://github.com/toolforgeio/toolforge-spi</url>
     </issueManagement>
 
     <properties>
