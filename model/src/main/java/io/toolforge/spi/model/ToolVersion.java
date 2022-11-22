@@ -20,9 +20,9 @@
 package io.toolforge.spi.model;
 
 import java.util.Arrays;
-import java.util.HexFormat;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import io.toolforge.spi.model.util.Hexadecimal;
 
 public class ToolVersion {
   public static final int LENGTH = 32;
@@ -33,7 +33,7 @@ public class ToolVersion {
 
   @JsonCreator
   public static ToolVersion fromString(String s) {
-    return of(HexFormat.of().parseHex(s));
+    return of(Hexadecimal.parseHex(s));
   }
 
   private final byte[] sha256;
@@ -76,6 +76,6 @@ public class ToolVersion {
   @Override
   @JsonValue
   public String toString() {
-    return HexFormat.of().formatHex(getSha256());
+    return Hexadecimal.formatHex(getSha256());
   }
 }

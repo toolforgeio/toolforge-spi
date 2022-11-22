@@ -19,21 +19,30 @@
  */
 package io.toolforge.spi.model;
 
+import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableList;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public class KeywordQuery {
-  public static KeywordQuery EMPTY = KeywordQuery.of(List.of());
+  public static KeywordQuery EMPTY = KeywordQuery.of(emptyList());
 
   private static final Pattern TOKEN_PATTERN = Pattern.compile("\\w{3,}");
 
   @JsonCreator
   public static KeywordQuery fromString(String s) {
-    return of(TOKEN_PATTERN.matcher(s).results().map(r -> r.group()).toList());
+    List<String> tokens = new ArrayList<>();
+
+    Matcher m = TOKEN_PATTERN.matcher(s);
+    while (m.find())
+      tokens.add(m.group());
+
+    return KeywordQuery.of(unmodifiableList(tokens));
   }
 
   public static KeywordQuery of(List<String> tokens) {

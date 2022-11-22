@@ -22,19 +22,17 @@ package io.toolforge.spi.model;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.HexFormat;
 import java.util.Objects;
 import java.util.regex.Pattern;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import io.toolforge.spi.model.util.Hexadecimal;
 
 public class ApiKeyId {
   /**
    * matches a lowercase SHA256 hash
    */
   private static final Pattern PATTERN = Pattern.compile("^[a-f0-9]{64}$");
-
-  private static final HexFormat HEX_FORMAT = HexFormat.of().withLowerCase();
 
   public static ApiKeyId fromToken(ApiKeyToken token) {
     MessageDigest md;
@@ -44,7 +42,7 @@ public class ApiKeyId {
       throw new AssertionError("JDK does not implement required hashing algorithm SHA-256", e);
     }
     byte[] hashCode = md.digest(token.getBody().getBytes(StandardCharsets.UTF_8));
-    String id = HEX_FORMAT.formatHex(hashCode);
+    String id = Hexadecimal.formatHex(hashCode);
     return of(id);
 
   }
