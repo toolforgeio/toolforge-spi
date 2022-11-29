@@ -10,12 +10,20 @@ servers:
 tags:
   - name: account
     description: Endpoints for manipulating accounts
-  - name: tool
-    description: Endpoints for manipulating tools
-  - name: execution
-    description: Endpoints for manipulating executions
+  - name: apiKey
+    description: Endpoints for manipulating API keys
+  - name: container
+    description: Endpoints for manipulating containers
   - name: docker
     description: Endpoints for managing Docker integration
+  - name: workspace
+    description: Endpoints for manipulating workspaces
+  - name: execution
+    description: Endpoints for manipulating executions
+  - name: secret
+    description: Endpoints for manipulating secrets
+  - name: tool
+    description: Endpoints for manipulating tools
 paths:
   /accounts:
     get:
@@ -97,6 +105,7 @@ paths:
     get:
       tags:
         - account
+        - apiKey
       summary: List account's API keys
       description: List one account's API keys one page at a time. Users can only retrieve their own API keys.
       operationId: listAccountApiKeys
@@ -128,6 +137,7 @@ paths:
     post:
       tags:
         - account
+        - apiKey
       summary: Create API key
       description: Create a new API key for the given account. Users can only create new API keys for their own accounts. Each account can have up to 10 API keys.
       operationId: createAccountApiKey
@@ -167,6 +177,7 @@ paths:
     get:
       tags:
         - account
+        - apiKey
       summary: Get API key
       description: Get one API key. Users can only retrieve API keys for their own accounts.
       operationId: getAccountApiKey
@@ -184,6 +195,7 @@ paths:
     delete:
       tags:
         - account
+        - apiKey
       summary: Delete API key
       description: Delete an API key from the given account. Users can only delete API keys from their own accounts.
       operationId: deleteAccountApiKey
@@ -269,29 +281,24 @@ paths:
         404:
           $ref: '#/components/responses/NotFound'
 
-  /tools:
+  /containers:
     get:
       tags:
-        - tool
-      summary: List tools
-      description: List one page of tools
-      operationId: listTools
+        - container
+      summary: List containers
+      description: List one page of containers
+      operationId: listContainers
       parameters:
         - name: q
           in: query
-          description: A keyword query to filter tool
+          description: A keyword query to filter containers
           schema:
             type: string
             format: KeywordQuery
             example: twitter account
-        - name: order
-          in: query
-          description: The order in which tools should be returned
-          schema:
-            $ref: '#/components/schemas/ToolListOrdering'
         - name: limit
           in: query
-          description: The maximum number of tools to return per page
+          description: The maximum number of containers to return per page
           schema:
             type: integer
             format: int32
@@ -303,122 +310,95 @@ paths:
           description: The pagination cursor
           schema:
             type: string
-            format: ToolCursor
+            format: ContainerCursor
       responses:
         200:
-          description: The list of tools was returned successfully.
+          description: The list of containers was returned successfully.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ToolPage'
+                $ref: '#/components/schemas/ContainerPage'
     post:
       tags:
-        - tool
-      summary: Create tool
-      description: Create a new tool
-      operationId: createTool
+        - container
+      summary: Create container
+      description: Create a new container
+      operationId: createContainer
       requestBody:
         content:
           'application/json':
             schema:
-              $ref: '#/components/schemas/ToolDefinition'
+              $ref: '#/components/schemas/ContainerDefinition'
       responses:
         200:
-          description: The tool was created successfully
+          description: The container was created successfully
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Tool'
+                $ref: '#/components/schemas/Container'
         422:
-          description: The tool could not be created. Is the name unique?
+          description: The container could not be created. Is the name unique?
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorMessage'
                 
-  /tools/{toolId}:
+  /containers/{containerId}:
     parameters:
-      - $ref: '#/components/parameters/toolId'
+      - $ref: '#/components/parameters/containerId'
     get:
       tags:
-        - tool
-      summary: Get tool
-      description: Get metadata about one tool
-      operationId: getTool
+        - container
+      summary: Get container
+      description: Get metadata about one container
+      operationId: getContainer
       responses:
         200:
-          description: The tool was found successfully.
+          description: The container was found successfully.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Tool'
+                $ref: '#/components/schemas/Container'
         403:
           $ref: '#/components/responses/Forbidden'
         404:
           $ref: '#/components/responses/NotFound'
     patch:
       tags:
-        - tool
-      summary: Get tool
-      description: Update metadata about one tool
-      operationId: updateTool
+        - container
+      summary: Update container
+      description: Update metadata about one container
+      operationId: updateContainer
       requestBody:
         content:
           'application/json':
             schema:
-              $ref: '#/components/schemas/ToolUpdate'
+              $ref: '#/components/schemas/ContainerUpdate'
       responses:
         200:
-          description: The tool was updated successfully.
+          description: The container was updated successfully.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Tool'
+                $ref: '#/components/schemas/Container'
         403:
           $ref: '#/components/responses/Forbidden'
         404:
           $ref: '#/components/responses/NotFound'
 
-  /tools/{toolId}/execute:
+  /containers/{containerId}/versions:
     parameters:
-      - $ref: '#/components/parameters/toolId'
-    post:
-      tags:
-        - tool
-        - execution
-      summary: Execute latest tool version
-      description: Execute the latest version of the given tool
-      operationId: executeLatestToolVersion
-      requestBody:
-        content:
-          'application/json':
-            schema:
-              $ref: '#/components/schemas/Invocation'
-      responses:
-        201:
-          description: The execution was created successfully.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Execution'
-        403:
-          $ref: '#/components/responses/Forbidden'
-        404:
-          $ref: '#/components/responses/NotFound'
-
-  /tools/{toolId}/versions:
-    parameters:
-      - $ref: '#/components/parameters/toolId'
+      - $ref: '#/components/parameters/containerId'
     get:
       tags:
-        - tool
-      summary: List tool versions
-      description: List one page of versions of the given tool. Tool versions are sorted by creation time, descending.
-      operationId: listToolVersions
+        - container
+      summary: List container versions
+      description: List one page of versions of the given container. Container versions are sorted by creation time, descending.
+      operationId: listContainerVersions
       parameters:
         - name: limit
           in: query
-          description: The maximum number of tools to return per page
+          description: The maximum number of versions to return per page
           schema:
             type: integer
             format: int32
@@ -428,72 +408,222 @@ paths:
           description: The pagination cursor
           schema:
             type: string
-            format: ToolCursor
+            format: ContainerVersionCursor
       responses:
         200:
           description: The tool was found successfully.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ToolPage'
+                $ref: '#/components/schemas/ContainerVersionPage'
         403:
           $ref: '#/components/responses/Forbidden'
         404:
           $ref: '#/components/responses/NotFound'
 
-  /tools/{toolId}/versions/{toolVersion}:
+  /containers/{containerId}/versions/{containerVersion}:
     parameters:
-      - $ref: '#/components/parameters/toolId'
-      - $ref: '#/components/parameters/toolVersion'
+      - $ref: '#/components/parameters/containerId'
+      - $ref: '#/components/parameters/containerVersion'
     get:
       tags:
-        - tool
-      summary: Get tool version
-      description: Get metadata about one version of one tool
-      operationId: getToolVersion
+        - container
+      summary: Get container version
+      description: Get metadata about one version of one container
+      operationId: getContainerVersion
       responses:
         200:
-          description: The tool was found successfully.
+          description: The container version was found successfully.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Tool'
+                $ref: '#/components/schemas/ContainerVersion'
         403:
           $ref: '#/components/responses/Forbidden'
         404:
           $ref: '#/components/responses/NotFound'
-
-  /tools/{toolId}/versions/{toolVersion}/execute:
-    parameters:
-      - $ref: '#/components/parameters/toolId'
-      - $ref: '#/components/parameters/toolVersion'
+          
+  /docker/otp:
     post:
       tags:
-        - tool
-        - execution
-      summary: Execute tool version
-      description: Execute the given version of the given tool
-      operationId: executeToolVersion
+        - docker
+      summary: Get one-time password for docker
+      description: Get a one-time password to use for docker login. Valid for 5 minutes.
+      operationId: getDockerOneTimePassword
+      responses:
+        200:
+          description: The one-time password was created successfully.
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/DockerPassword'
+        403:
+          $ref: '#/components/responses/Forbidden'
+          
+  /workspaces:
+    get:
+      tags:
+        - workspace
+      summary: List workspaces
+      description: Get one page of workspaces
+      operationId: listWorkspaces
+      responses:
+        200:
+          description: The workspaces were retrieved successfully
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/WorkspacePage'
+
+  /workspaces/{workspaceId}:
+    parameters:
+      - $ref: '#/components/parameters/workspaceId'
+    get:
+      tags:
+        - workspace
+      summary: Get workspace
+      description: Get one workspace
+      operationId: getWorkspace
+      responses:
+        200:
+          description: The workspace astrieved successfully
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/WorkspacePage'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+  /workspaces/{workspaceId}/secrets:
+    parameters:
+      - $ref: '#/components/parameters/workspaceId'
+    post:
+      tags:
+        - workspace
+        - secret
+      summary: Create workspace secret
+      description: Create a new secret in the given workspace
+      operationId: createWorkspaceSecret
       requestBody:
         content:
           'application/json':
             schema:
-              $ref: '#/components/schemas/Invocation'
+              $ref: '#/components/schemas/SecretDefinition'
       responses:
-        201:
-          description: The execution was created successfully.
+        200:
+          description: The secret was created successfully.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Execution'
+                $ref: '#/components/schemas/Secret'
+        403:
+          $ref: '#/components/responses/Forbidden'
+    get:
+      tags:
+        - workspace
+        - secret
+      summary: List workspace secrets
+      description: List one page of secrets in the given workspace
+      operationId: listWorkspaceSecrets
+      parameters:
+        - name: q
+          in: query
+          description: A keyword query for filtering secrets
+          schema:
+            type: string
+            format: KeywordQuery
+            example: service name
+        - name: owner
+          in: query
+          description: The owner of the secrets to return
+          schema:
+            type: string
+            format: AccountReference
+        - name: limit
+          in: query
+          description: The maximum number of executions to return per page
+          schema:
+            type: integer
+            format: int32
+            default: 10
+            minimum: 0
+            maximum: 100
+        - name: cursor
+          in: query
+          description: The pagination cursor
+          schema:
+            type: string
+            format: SecretCursor
+      responses:
+        200:
+          description: The list of executions returned successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SecretPage'
+
+  /workspaces/{workspaceId}/secrets/{secretId}:
+    parameters:
+      - $ref: '#/components/parameters/workspaceId'
+      - $ref: '#/components/parameters/secretId'
+    get:
+      tags:
+        - workspace
+        - secret
+      summary: Get workspace secret
+      description: Get metadata about the given secret in the given workspace. This does not reveal the secret value.
+      operationId: getWorkspaceSecret
+      responses:
+        200:
+          description: The secret was created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Secret'
+        404:
+          $ref: '#/components/responses/NotFound'
+    patch:
+      tags:
+        - workspace
+        - secret
+      summary: Update workspace secret
+      description: Updates the given secret in the given workspace
+      operationId: updateWorkspaceSecret
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/SecretUpdate'
+      responses:
+        200:
+          description: The secret was updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SecretPage'
         403:
           $ref: '#/components/responses/Forbidden'
         404:
           $ref: '#/components/responses/NotFound'
+    delete:
+      tags:
+        - workspace
+        - secret
+      summary: Delete workspace secret
+      description: Deletes the given secret in the given workspace
+      operationId: deleteWorkspaceSecret
+      responses:
+        204:
+          description: The secret was deleted successfully.
+        403:
+          $ref: '#/components/responses/Forbidden'
 
-  /executions:
+  /workspaces/{workspaceId}/executions:
+    parameters:
+      - $ref: '#/components/parameters/workspaceId'
     get:
       tags:
+        - workspace
         - execution
       summary: List executions
       description: List one page of executions
@@ -540,11 +670,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/ExecutionPage'
 
-  /executions/{executionId}:
+  /workspaces/{workspaceId}/executions/{executionId}:
     parameters:
+      - $ref: '#/components/parameters/workspaceId'
       - $ref: '#/components/parameters/executionId'
     get:
       tags:
+        - workspace
         - execution
       summary: Get execution
       description: Get metadata about one execution
@@ -564,6 +696,7 @@ paths:
           $ref: '#/components/responses/Gone'
     patch:
       tags:
+        - workspace
         - execution
       summary: Update execution
       description: Update metadata about one execution
@@ -588,6 +721,7 @@ paths:
           $ref: '#/components/responses/Gone'
     delete:
       tags:
+        - workspace
         - execution
       summary: Delete execution
       description: Delete an execution by ID
@@ -598,36 +732,13 @@ paths:
         403:
           $ref: '#/components/responses/Forbidden'
 
-  /executions/{executionId}/cancel:
+  /workspaces/{workspaceId}/executions/{executionId}/logs:
     parameters:
-      - $ref: '#/components/parameters/executionId'
-    post:
-      tags:
-        - execution
-      summary: Cancel execution
-      description: Cancel an execution
-      operationId: cancelExecution
-      responses:
-        200:
-          description: The execution was canceled successfully.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Execution'
-        403:
-          $ref: '#/components/responses/Forbidden'
-        404:
-          $ref: '#/components/responses/NotFound'
-        409:
-          $ref: '#/components/responses/Conflict'
-        410:
-          $ref: '#/components/responses/Gone'
-
-  /executions/{executionId}/logs:
-    parameters:
+      - $ref: '#/components/parameters/workspaceId'
       - $ref: '#/components/parameters/executionId'
     get:
       tags:
+        - workspace
         - execution
       summary: Get execution log page
       description: Get a page of the execution's logs
@@ -654,8 +765,9 @@ paths:
         410:
           $ref: '#/components/responses/Gone'
 
-  /executions/{executionId}/inputs/{name}:
+  /workspaces/{workspaceId}/executions/{executionId}/inputs/{name}:
     parameters:
+      - $ref: '#/components/parameters/workspaceId'
       - $ref: '#/components/parameters/executionId'
       - name: name
         in: path
@@ -663,9 +775,10 @@ paths:
         required: true
         schema:
           type: string
-          format: ExecutionInputName
+          format: SlotName
     get:
       tags:
+        - workspace
         - execution
       summary: Get execution input
       description: Get metadata about the given execution's given input slot
@@ -685,8 +798,9 @@ paths:
         410:
           $ref: '#/components/responses/Gone'
 
-  /executions/{executionId}/outputs/{name}:
+  /workspaces/{workspaceId}/executions/{executionId}/outputs/{name}:
     parameters:
+      - $ref: '#/components/parameters/workspaceId'
       - $ref: '#/components/parameters/executionId'
       - name: name
         in: path
@@ -694,9 +808,10 @@ paths:
         required: true
         schema:
           type: string
-          format: ExecutionOutputName
+          format: SlotName
     get:
       tags:
+        - workspace
         - execution
       summary: Get execution output
       description: Get metadata about the given execution's given output slot
@@ -728,8 +843,9 @@ paths:
         410:
           $ref: '#/components/responses/Gone'
 
-  /executions/{executionId}/outputs/{name}.{extension}:
+  /workspaces/{workspaceId}/executions/{executionId}/outputs/{name}.{extension}:
     parameters:
+      - $ref: '#/components/parameters/workspaceId'
       - $ref: '#/components/parameters/executionId'
       - name: name
         in: path
@@ -737,16 +853,17 @@ paths:
         required: true
         schema:
           type: string
-          format: ExecutionOutputName
+          format: SlotName
       - name: extension
         in: path
         description: The extension of the output to retrieve
         required: true
         schema:
           type: string
-          format: ExecutionOutputExtension
+          format: FileExtension
     get:
       tags:
+        - workspace
         - execution
       summary: Get execution output
       description: Get metadata about the given execution's given output slot
@@ -778,9 +895,163 @@ paths:
         410:
           $ref: '#/components/responses/Gone'
          
-  /blobs:
+  /workspaces/{workspaceId}/executions/{executionId}/cancel:
+    parameters:
+      - $ref: '#/components/parameters/workspaceId'
+      - $ref: '#/components/parameters/executionId'
     post:
       tags:
+        - workspace
+        - execution
+      summary: Cancel execution
+      description: Cancel an execution
+      operationId: cancelExecution
+      responses:
+        200:
+          description: The execution was canceled successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Execution'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        404:
+          $ref: '#/components/responses/NotFound'
+        409:
+          $ref: '#/components/responses/Conflict'
+        410:
+          $ref: '#/components/responses/Gone'
+
+  /workspaces/{workspaceId}/tools:
+    parameters:
+      - $ref: '#/components/parameters/workspaceId'
+    post:
+      tags:
+        - workspace
+        - tool
+      summary: Install tool into workspace
+      description: Install the given tool into the given workspace
+      operationId: createWorkspaceTool
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/ToolInstallation'
+      responses:
+        200:
+          description: The tool was installed successfully
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Tool'
+    get:
+      tags:
+        - workspace
+        - tool
+      summary: List workspace tools
+      description: List the tools installed in the given workspace
+      operationId: listWorkspaceTools
+      responses:
+        200:
+          description: The workspace astrieved successfully
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/ToolPage'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+  /workspaces/{workspaceId}/tools/{toolId}:
+    parameters:
+      - $ref: '#/components/parameters/workspaceId'
+      - $ref: '#/components/parameters/toolId'
+    get:
+      tags:
+        - workspace
+        - tool
+      summary: Get workspace tool
+      description: Get the tool
+      operationId: getWorkspaceTool
+      responses:
+        200:
+          description: The workspace astrieved successfully
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Tool'
+        404:
+          $ref: '#/components/responses/NotFound'
+    patch:
+      tags:
+        - workspace
+        - tool
+      summary: Update tool in workspace
+      description: Update the given tool in the workspace
+      operationId: updateWorkspaceTool
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/ToolUpdate'
+      responses:
+        200:
+          description: The tool was installed successfully
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Tool'
+    delete:
+      tags:
+        - workspace
+        - tool
+      summary: Delete tool from workspace
+      description: Get the given tool in the workspace
+      operationId: deleteWorkspaceTool
+      responses:
+        204:
+          description: The tool was deleted successfully
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Tool'
+        409:
+          $ref: '#/components/responses/Conflict'
+
+  /workspaces/{workspaceId}/tools/{toolId}/execute:
+    parameters:
+      - $ref: '#/components/parameters/workspaceId'
+      - $ref: '#/components/parameters/toolId'
+    post:
+      tags:
+        - tool
+        - workspace
+        - execution
+      summary: Execute latest tool version
+      description: Execute the latest version of the given tool
+      operationId: executeLatestToolVersion
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/Invocation'
+      responses:
+        201:
+          description: The execution was created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Execution'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+  /workspaces/{workspaceId}/blobs:
+    parameters:
+      - $ref: '#/components/parameters/workspaceId'
+    post:
+      tags:
+        - workspace
         - blob
       summary: Create a blob
       # NOTE: Send filename on x-blob-filename header.
@@ -800,11 +1071,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/Blob'
   
-  /blobs/{blobId}:
+  /workspaces/{workspaceId}/blobs/{blobId}:
     parameters:
+      - $ref: '#/components/parameters/workspaceId'
       - $ref: '#/components/parameters/blobId'
     get:
       tags:
+        - workspace
         - blob
       summary: Get a blob
       description: Retrieve information about the given blob
@@ -819,23 +1092,6 @@ paths:
         404:
           $ref: '#/components/responses/NotFound'
           
-  /docker/otp:
-    post:
-      tags:
-        - docker
-      summary: Get one-time password for docker
-      description: Get a one-time password to use for docker login. Valid for 5 minutes.
-      operationId: getDockerOneTimePassword
-      responses:
-        200:
-          description: The one-time password was created successfully.
-          content:
-            'application/json':
-              schema:
-                $ref: '#/components/schemas/DockerPassword'
-        403:
-          $ref: '#/components/responses/Forbidden'
-
 components:
   responses:
     Processing:
@@ -885,7 +1141,23 @@ components:
       required: true
       schema:
         type: string
-        format: VersionId
+        format: ToolVersionId
+    containerId:
+      name: containerId
+      in: path
+      description: The ID of the container to manipulate
+      required: true
+      schema:
+        type: string
+        format: ContainerId
+    containerVersion:
+      name: containerVersion
+      in: path
+      description: The ID of the container version to manipulate
+      required: true
+      schema:
+        type: string
+        format: ContainerVersionId
     executionId:
       name: executionId
       in: path
@@ -894,14 +1166,14 @@ components:
       schema:
         type: string
         format: ExecutionId
-    outputSlotId:
-      name: outputSlotId
+    workspaceId:
+      name: workspaceId
       in: path
-      description: The ID of the output slot to manipulate
+      description: The ID of the workspace to manipulate
       required: true
       schema:
         type: string
-        format: OutputSlotId
+        format: WorkspaceId
     blobId:
       name: blobId
       in: path
@@ -910,6 +1182,14 @@ components:
       schema:
         type: string
         format: BlobId
+    secretId:
+      name: secretId
+      in: path
+      description: The ID of the secret to manipulate
+      required: true
+      schema:
+        type: string
+        format: SecretId
     limit:
       name: limit
       in: query
@@ -983,7 +1263,12 @@ components:
       allOf:
         - $ref: '#/components/schemas/AccountDescription'
         - type: object
-          properties: {}
+          properties:
+            roles:
+              type: array
+              items:
+                type: string
+                format: RoleId
           
     AccountListOrdering:
       type: string
@@ -1006,116 +1291,138 @@ components:
         cursor:
           type: string
           format: AccountCursor
-
-    LogPage:
+          
+    SecretDefinition:
       type: object
       required:
-      - items
+        - name
+        - value
+      properties:
+        name:
+          type: string
+          pattern: "[a-zA-z][a-zA-Z0-9_]*"
+          minLength: 1
+          maxLength: 64
+        description:
+          type: string
+          format: markdown
+        value:
+          type: string
+          minLength: 1
+          maxLength: 10240
+          
+    SecretPreview:
+      type: object
+      properties:
+        id:
+          type: string
+          format: SecretId
+        name:
+          type: string
+        owner:
+          type: string
+          format: AccountId
+          
+    SecretDescription:
+      allOf:
+        - $ref: '#/components/schemas/SecretPreview'
+        - type: object
+          properties:
+            createdAt:
+              type: string
+              format: date-time
+            retrievedAt:
+              type: string
+              format: date-time
+          
+    Secret:
+      allOf:
+        - $ref: '#/components/schemas/SecretDescription'
+        - type: object
+          properties:
+            updatedAt:
+              type: string
+              format: date-time
+            description:
+              type: string
+              format: markdown
+              
+    SecretUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+          format: markdown
+        value:
+          type: string
+
+    SecretPage:
+      type: object
       properties:
         items:
           type: array
           items:
-            $ref: '#/components/schemas/LogEntry'
+            $ref: '#/components/schemas/SecretDescription'
+        total:
+          type: integer
+          format: int32
         cursor:
           type: string
-          format: LogCursor
-      
-    LogEntry:
-      type: object
-      required:
-      - timestamp
-      - message
-      properties:
-        timestamp:
-          type: string
-          format: date-time
-        message:
-          type: string
+          format: SecretCursor
 
-    ToolDefinition:
-      type: object
-      required:
-        - name
-        - description
-      properties:
-        # TODO Installation configuration? Secrets?
-        name:
-          type: string
-        description:
-          type: string
-          format: markdown
-
-    ManifestEnvironmentVariable:
-      type: object
-      required:
-        - name
-        - required
-        - description
-      properties:
-        name:
-          type: string
-          pattern: '^[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)*'
-          minLength: 1
-          maxLength: 64
-        description:
-          type: string
-          format: markdown
-        required:
-          type: boolean
-        default:
-          type: string
-
-    ManifestEnvironmentSecret:
-      type: object
-      required:
-        - name
-        - required
-        - description
-      properties:
-        name:
-          type: string
-          pattern: '^[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)*'
-          minLength: 1
-          maxLength: 64
-        description:
-          type: string
-          format: markdown
-        required:
-          type: boolean
-        example:
-          type: string
-
-    ManifestEnvironmentSize:
+    WorkspaceVisibility:
       type: string
       enum:
-        # 0.25CPU, 2GB Memory
-        - tiny
-        # 0.5CPU, 4GB Memory
-        - small
-        # 1.0CPU, 8GB Memory
-        - medium
-        # 2.0 CPU, 16GB Memory
-        - large
-        # 4.0 CPU, 30GB Memory
-        - xlarge
-
-    ManifestEnvironment:
+        - public
+        - private
+          
+    WorkspacePreview:
       type: object
       properties:
-        size:
-          $ref: '#/components/schemas/ManifestEnvironmentSize'
-        variables:
+        id:
+          type: string
+          format: WorkspaceId
+        owner:
+          $ref: '#/components/schemas/AccountPreview'
+        name:
+          type: string
+          maxLength: 80
+        slug:
+          type: string
+          maxLength: 80
+          
+    WorkspaceDescription:
+      allOf:
+        - $ref: '#/components/schemas/WorkspaceDescription'
+        - type: object
+          properties:
+            visibility:
+              $ref: '#/components/schemas/WorkspaceVisibility'
+
+    Workspace:
+      allOf:
+        - $ref: '#/components/schemas/WorkspaceDescription'
+        - type: object
+          properties:
+            description:
+              type: string
+              format: markdown
+          
+    WorkspacePage:
+      type: object
+      properties:
+        items:
           type: array
-          minLength: 0
-          maxLength: 10
           items:
-            $ref: '#/components/schemas/ManifestEnvironmentVariable'
-        secrets:
-          type: array
-          minLength: 0
-          maxLength: 10
-          items:
-            $ref: '#/components/schemas/ManifestEnvironmentSecret'
+            $ref: '#/components/schemas/WorkspaceDescription'
+        total:
+          type: integer
+          format: int32
+        cursor:
+          type: string
+          format: WorkspaceCursor
 
     ApiKeyDescription:
       type: object
@@ -1189,168 +1496,6 @@ components:
         cursor:
           type: string
           format: ApiKeyCursor
-
-    Manifest:
-      type: object
-      properties:
-        toolforge:
-          # 1.0 for now
-          type: string
-          format: ManifestVersion
-        tool:
-          type: string
-          format: ToolId
-        environment:
-          $ref: '#/components/schemas/ManifestEnvironment'
-        # TODO cost? or is that in tool?
-        parameters:
-          type: array
-          items:
-            $ref: '#/components/schemas/ParameterDefinition'
-        inputs:
-          type: array
-          items:
-            $ref: '#/components/schemas/ToolInput'
-        outputs:
-          type: array
-          items:
-            $ref: '#/components/schemas/ToolOutput'
-            
-    ToolListOrdering:
-      type: string
-      enum:
-        - lastExecutedByTeamAt
-        - lastExecutedByMeAt
-        - name
-
-    ToolUpdate:
-      type: object
-      properties:
-        name:
-          type: string
-        description:
-          type: string
-          format: markdown
-        owner:
-          type: string
-          format: AccountId
-
-    ToolPreview:
-      type: object
-      required:
-        - id
-        - owner
-        - name
-        - slug
-      properties:
-        id:
-          type: string
-          format: ToolId
-        version:
-          type: string
-          format: VersionId
-        owner:
-          $ref: '#/components/schemas/AccountPreview'
-        name:
-          type: string
-        slug:
-          type: string
-      
-    ToolDescription:
-      allOf:
-        - $ref: '#/components/schemas/ToolPreview'
-        - type: object
-          required:
-            - createdAt
-            - description
-          properties:
-            description:
-              type: string
-              format: markdown
-            createdAt:
-              type: string
-              format: date-time
-            updatedAt:
-              type: string
-              format: date-time
-            lastExecutedByMeAt:
-              type: string
-              format: date-time
-            lastExecutedByTeamAt:
-              type: string
-              format: date-time
-
-    Tool:
-      allOf:
-        - $ref: '#/components/schemas/ToolDescription'
-        - type: object
-          properties:
-            parameters:
-              type: array
-              items:
-                $ref: '#/components/schemas/Parameter'
-            inputs:
-              type: array
-              items:
-                $ref: '#/components/schemas/ToolInput'
-            outputs:
-              type: array
-              items:
-                $ref: '#/components/schemas/ToolOutput'
-            
-    ToolInput:
-      type: object
-      required:
-        - name
-        - description
-      properties:
-        name:
-          type: string
-          pattern: "^[a-zA-Z][a-zA-Z0-9]*$"
-          maxLength: 64
-        description:
-          type: string
-          format: markdown
-        extensions:
-          type: array
-          uniqueItems: true
-          minItems: 1
-          items:
-            type: string
-            format: FileExtension
-          
-    ToolOutput:
-      type: object
-      required:
-        - name
-        - description
-      properties:
-        name:
-          type: string
-        description:
-          type: string
-          format: markdown
-        extensions:
-          type: array
-          uniqueItems: true
-          minItems: 1
-          items:
-            type: string
-            format: FileExtension
-
-    ToolPage:
-      type: object
-      properties:
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/ToolDescription'
-        total:
-          type: integer
-          format: int32
-        cursor:
-          type: string
-          format: ToolCursor
 
     StringDomainType:
       type: string
@@ -1514,6 +1659,83 @@ components:
             default:
               type: boolean
             
+    Slot:
+      type: object
+      required:
+        - name
+        - description
+      properties:
+        name:
+          type: string
+          pattern: "^[a-zA-Z][a-zA-Z0-9]*$"
+          maxLength: 64
+        description:
+          type: string
+          format: markdown
+        extensions:
+          type: array
+          uniqueItems: true
+          minItems: 1
+          items:
+            type: string
+            format: FileExtension
+
+    ManifestEnvironment:
+      type: object
+      required:
+        - size
+      properties:
+        size:
+          $ref: '#/components/schemas/ContainerSize'
+        variables:
+          type: array
+          minLength: 0
+          maxLength: 10
+          items:
+            $ref: '#/components/schemas/ContainerVersionVariable'
+        secrets:
+          type: array
+          minLength: 0
+          maxLength: 10
+          items:
+            $ref: '#/components/schemas/ContainerVersionSecret'
+
+    Manifest:
+      type: object
+      required:
+        - toolforge
+        - tool
+        - environment
+      properties:
+        toolforge:
+          # 1.0 for now
+          type: string
+          format: ManifestVersion
+        tool:
+          type: string
+          format: ToolId
+        environment:
+          $ref: '#/components/schemas/ManifestEnvironment'
+        # TODO cost? or is that in tool?
+        parameters:
+          type: array
+          minLength: 0
+          maxLength: 10
+          items:
+            $ref: '#/components/schemas/ParameterDefinition'
+        inputs:
+          type: array
+          minLength: 0
+          maxLength: 10
+          items:
+            $ref: '#/components/schemas/Slot'
+        outputs:
+          type: array
+          minLength: 0
+          maxLength: 10
+          items:
+            $ref: '#/components/schemas/Slot'
+            
     Parameter:
       type: object
       required:
@@ -1607,6 +1829,361 @@ components:
             default:
               type: boolean
             
+    ContainerDefinition:
+      type: object
+      required:
+        - name
+        - description
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+          format: markdown
+
+    ContainerVersionVariable:
+      type: object
+      required:
+        - name
+        - required
+        - description
+      properties:
+        name:
+          type: string
+          pattern: '^[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)*'
+          minLength: 1
+          maxLength: 64
+        description:
+          type: string
+          format: markdown
+        required:
+          type: boolean
+        default:
+          type: string
+
+    ContainerVersionSecret:
+      type: object
+      required:
+        - name
+        - required
+        - description
+      properties:
+        name:
+          type: string
+          pattern: '^[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)*'
+          minLength: 1
+          maxLength: 64
+        description:
+          type: string
+          format: markdown
+        required:
+          type: boolean
+        example:
+          type: string
+
+    ContainerSize:
+      type: string
+      enum:
+        # 0.25CPU, 2GB Memory
+        - tiny
+        # 0.5CPU, 4GB Memory
+        - small
+        # 1.0CPU, 8GB Memory
+        - medium
+        # 2.0 CPU, 16GB Memory
+        - large
+        # 4.0 CPU, 30GB Memory
+        - xlarge
+
+    ContainerPreview:
+      type: object
+      required:
+        - id
+        - owner
+        - name
+        - slug
+      properties:
+        id:
+          type: string
+          format: ContainerId
+        currentVersion:
+          type: string
+          format: ContainerVersionId
+        owner:
+          $ref: '#/components/schemas/AccountPreview'
+        name:
+          type: string
+        slug:
+          type: string
+      
+    ContainerDescription:
+      allOf:
+        - $ref: '#/components/schemas/ContainerPreview'
+        - type: object
+          required:
+            - createdAt
+            - description
+          properties:
+            description:
+              type: string
+              format: markdown
+            createdAt:
+              type: string
+              format: date-time
+            updatedAt:
+              type: string
+              format: date-time
+              
+    Container:
+      allOf:
+        - $ref: '#/components/schemas/ContainerDescription'
+        - type: object
+          properties:
+            parameters:
+              type: array
+              items:
+                $ref: '#/components/schemas/Parameter'
+            inputs:
+              type: array
+              items:
+                $ref: '#/components/schemas/Slot'
+            outputs:
+              type: array
+              items:
+                $ref: '#/components/schemas/Slot'
+            variables:
+              type: array
+              minLength: 0
+              maxLength: 10
+              items:
+                $ref: '#/components/schemas/ContainerVersionVariable'
+            secrets:
+              type: array
+              minLength: 0
+              maxLength: 10
+              items:
+                $ref: '#/components/schemas/ContainerVersionSecret'
+            
+    ContainerPage:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContainerDescription'
+        total:
+          type: integer
+          format: int32
+        cursor:
+          type: string
+          format: ContainerCursor
+
+    ContainerUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+          format: markdown
+        owner:
+          type: string
+          format: AccountId
+          
+    ContainerVersionDescription:
+      type: object
+      properties:
+        # TODO creator?
+        version:
+          type: string
+          format: ContainerVersionId
+        createdAt:
+          type: string
+          format: date-time
+
+    ContainerVersion:
+      allOf:
+        - $ref: '#/components/schemas/ContainerVersionDescription'
+        - type: object
+          properties:
+            parameters:
+              type: array
+              minLength: 0
+              maxLength: 10
+              items:
+                $ref: '#/components/schemas/Parameter'
+            inputs:
+              type: array
+              minLength: 0
+              maxLength: 10
+              items:
+                $ref: '#/components/schemas/Slot'
+            outputs:
+              type: array
+              minLength: 0
+              maxLength: 10
+              items:
+                $ref: '#/components/schemas/Slot'
+            variables:
+              type: array
+              minLength: 0
+              maxLength: 10
+              items:
+                $ref: '#/components/schemas/ContainerVersionVariable'
+            secrets:
+              type: array
+              minLength: 0
+              maxLength: 10
+              items:
+                $ref: '#/components/schemas/ContainerVersionSecret'
+                
+    ContainerVersionPage:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContainerDescription'
+        total:
+          type: integer
+          format: int32
+        cursor:
+          type: string
+          format: ContainerVeresionCursor
+          
+    ToolInstallationVariable:
+      type: object
+      required:
+        - name
+        - value
+      properties:
+        name:
+          type: string
+          maxLength: 64
+        value:
+          type: string
+          
+    ToolInstallationSecret:
+      type: object
+      required:
+        - name
+        - secret
+      properties:
+        name:
+          type: string
+          maxLength: 64
+        secret:
+          type: string
+          format: SecretId
+          
+    ToolInstallation:
+      type: object
+      properties:
+        container:
+          type: string
+          format: ContainerId
+        variables:
+          type: array
+          minLength: 1
+          maxLength: 10
+          items:
+            $ref: '#/components/schemas/ToolInstallationVariable'
+        secrets:
+          type: array
+          minLength: 1
+          maxLength: 10
+          items:
+            $ref: '#/components/schemas/ToolInstallationSecret'
+
+    ToolUpdate:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+          format: markdown
+        owner:
+          type: string
+          format: AccountId
+
+    ToolPreview:
+      type: object
+      required:
+        - id
+        - owner
+        - name
+        - slug
+      properties:
+        id:
+          type: string
+          format: ToolId
+        version:
+          type: string
+          format: VersionId
+        owner:
+          $ref: '#/components/schemas/AccountPreview'
+        name:
+          type: string
+        slug:
+          type: string
+      
+    ToolDescription:
+      allOf:
+        - $ref: '#/components/schemas/ToolPreview'
+        - type: object
+          required:
+            - createdAt
+            - description
+          properties:
+            description:
+              type: string
+              format: markdown
+            createdAt:
+              type: string
+              format: date-time
+            updatedAt:
+              type: string
+              format: date-time
+            lastExecutedByMeAt:
+              type: string
+              format: date-time
+            lastExecutedByTeamAt:
+              type: string
+              format: date-time
+
+    Tool:
+      allOf:
+        - $ref: '#/components/schemas/ToolDescription'
+        - type: object
+          properties:
+            parameters:
+              type: array
+              items:
+                $ref: '#/components/schemas/Parameter'
+            inputs:
+              type: array
+              items:
+                $ref: '#/components/schemas/Slot'
+            outputs:
+              type: array
+              items:
+                $ref: '#/components/schemas/Slot'
+            
+    ToolPage:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ToolDescription'
+        total:
+          type: integer
+          format: int32
+        cursor:
+          type: string
+          format: ToolCursor
+
     Argument:
       type: object
       properties:
@@ -1674,6 +2251,31 @@ components:
           items:
             $ref: '#/components/schemas/InvocationInput'
             
+    LogEntry:
+      type: object
+      required:
+      - timestamp
+      - message
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+
+    LogPage:
+      type: object
+      required:
+      - items
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/LogEntry'
+        cursor:
+          type: string
+          format: LogCursor
+      
     ExecutionState:
       type: string
       enum:
@@ -1759,11 +2361,9 @@ components:
         - waiting
         # The data is available now.
         - populated
-        # The data is not available now and will not be available in the future
-        # because the execution completed successfully but did not populate it.
+        # The data is not available now and will not be available in the future because the execution completed successfully but did not populate it.
         - unpopulated
-        # The data is not available now and will not be available in the future
-        # because the execution did not complete successfully. 
+        # The data is not available now and will not be available in the future because the execution did not complete successfully. 
         - cancelled
 
     ExecutionInput:
