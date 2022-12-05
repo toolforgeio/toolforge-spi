@@ -467,6 +467,35 @@ paths:
       summary: List workspaces
       description: Get one page of workspaces
       operationId: listWorkspaces
+      parameters:
+        - name: q
+          in: query
+          description: A keyword query for filtering workspaces
+          schema:
+            type: string
+            format: KeywordQuery
+            example: service name
+        - name: owner
+          in: query
+          description: The owner of the workspaces to return
+          schema:
+            type: string
+            format: AccountReference
+        - name: limit
+          in: query
+          description: The maximum number of executions to return per page
+          schema:
+            type: integer
+            format: int32
+            default: 10
+            minimum: 0
+            maximum: 100
+        - name: cursor
+          in: query
+          description: The pagination cursor
+          schema:
+            type: string
+            format: WorkspaceCursor
       responses:
         200:
           description: The workspaces were retrieved successfully
@@ -490,7 +519,7 @@ paths:
           content:
             'application/json':
               schema:
-                $ref: '#/components/schemas/WorkspacePage'
+                $ref: '#/components/schemas/Workspace'
         404:
           $ref: '#/components/responses/NotFound'
 
@@ -600,7 +629,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SecretPage'
+                $ref: '#/components/schemas/Secret'
         403:
           $ref: '#/components/responses/Forbidden'
         404:
@@ -951,6 +980,34 @@ paths:
       summary: List workspace tools
       description: List the tools installed in the given workspace
       operationId: listWorkspaceTools
+      parameters:
+        - name: q
+          in: query
+          description: A keyword query to filter tool
+          schema:
+            type: string
+            format: KeywordQuery
+            example: twitter account
+        - name: order
+          in: query
+          description: The order in which tools are returned
+          schema:
+            $ref: '#/components/schemas/ToolListOrdering'
+        - name: limit
+          in: query
+          description: The maximum number of tools to return per page
+          schema:
+            type: integer
+            format: int32
+            default: 10
+            minimum: 0
+            maximum: 100
+        - name: cursor
+          in: query
+          description: The pagination cursor
+          schema:
+            type: string
+            format: ToolCursor        
       responses:
         200:
           description: The workspace astrieved successfully
@@ -1320,8 +1377,7 @@ components:
         name:
           type: string
         owner:
-          type: string
-          format: AccountId
+          $ref: '#/components/schemas/AccountPreview'
           
     SecretDescription:
       allOf:
@@ -1355,6 +1411,9 @@ components:
         description:
           type: string
           format: markdown
+        owner:
+          type: string
+          format: AccountId
         value:
           type: string
 
@@ -1395,7 +1454,7 @@ components:
           
     WorkspaceDescription:
       allOf:
-        - $ref: '#/components/schemas/WorkspaceDescription'
+        - $ref: '#/components/schemas/WorkspacePreview'
         - type: object
           properties:
             visibility:
@@ -1906,9 +1965,6 @@ components:
         id:
           type: string
           format: ContainerId
-        currentVersion:
-          type: string
-          format: ContainerVersionId
         owner:
           $ref: '#/components/schemas/AccountPreview'
         name:
@@ -1930,39 +1986,14 @@ components:
             createdAt:
               type: string
               format: date-time
-            updatedAt:
-              type: string
-              format: date-time
               
     Container:
       allOf:
         - $ref: '#/components/schemas/ContainerDescription'
         - type: object
           properties:
-            parameters:
-              type: array
-              items:
-                $ref: '#/components/schemas/Parameter'
-            inputs:
-              type: array
-              items:
-                $ref: '#/components/schemas/Slot'
-            outputs:
-              type: array
-              items:
-                $ref: '#/components/schemas/Slot'
-            variables:
-              type: array
-              minLength: 0
-              maxLength: 10
-              items:
-                $ref: '#/components/schemas/ContainerVersionVariable'
-            secrets:
-              type: array
-              minLength: 0
-              maxLength: 10
-              items:
-                $ref: '#/components/schemas/ContainerVersionSecret'
+            currentVersion:
+              $ref: '#/components/schemas/ContainerVersion'
             
     ContainerPage:
       type: object
@@ -1989,17 +2020,21 @@ components:
         owner:
           type: string
           format: AccountId
+        currentVersion:
+          type: string
+          format: ContainerVersionId
           
     ContainerVersionDescription:
       type: object
       properties:
-        # TODO creator?
         version:
           type: string
           format: ContainerVersionId
         createdAt:
           type: string
           format: date-time
+        creator:
+          $ref: '#/components/schemas/AccountPreview'
 
     ContainerVersion:
       allOf:
@@ -2043,13 +2078,13 @@ components:
         items:
           type: array
           items:
-            $ref: '#/components/schemas/ContainerDescription'
+            $ref: '#/components/schemas/ContainerVersionDescription'
         total:
           type: integer
           format: int32
         cursor:
           type: string
-          format: ContainerVeresionCursor
+          format: ContainerVersionCursor
           
     ToolInstallationVariable:
       type: object
@@ -2095,17 +2130,50 @@ components:
           items:
             $ref: '#/components/schemas/ToolInstallationSecret'
 
-    ToolUpdate:
+    ToolListOrdering:
+      type: string
+      enum:
+        - lastExecutedByTeamAt
+        - lastExecutedByMeAt
+        - name
+
+    ToolUpdateVariable:
       type: object
+      required:
+        - name
       properties:
         name:
           type: string
-        description:
+          maxLength: 64
+        value:
           type: string
-          format: markdown
+          
+    ToolUpdateSecret:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          maxLength: 64
+        secret:
+          type: string
+          format: SecretId
+          
+    ToolUpdate:
+      type: object
+      properties:
         owner:
           type: string
           format: AccountId
+        variables:
+          type: array
+          items:
+            $ref: '#/components/schemas/ToolUpdateVariable'
+        secrets:
+          type: array
+          items:
+            $ref: '#/components/schemas/ToolUpdateSecret'
 
     ToolPreview:
       type: object
@@ -2118,9 +2186,9 @@ components:
         id:
           type: string
           format: ToolId
-        version:
+        currentVersion:
           type: string
-          format: VersionId
+          format: ToolVersionId
         owner:
           $ref: '#/components/schemas/AccountPreview'
         name:
@@ -2140,9 +2208,6 @@ components:
               type: string
               format: markdown
             createdAt:
-              type: string
-              format: date-time
-            updatedAt:
               type: string
               format: date-time
             lastExecutedByMeAt:
@@ -2330,6 +2395,9 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ExecutionDescription'
+        total:
+          type: integer
+          format: int32
         cursor:
           type: string
           format: ExecutionCursor

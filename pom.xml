@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
@@ -130,18 +131,27 @@
                             <importMapping>ApiKeyHint=io.toolforge.spi.model.ApiKeyHint</importMapping>
                             <importMapping>ApiKeyId=io.toolforge.spi.model.ApiKeyId</importMapping>
                             <importMapping>ApiKeyToken=io.toolforge.spi.model.ApiKeyToken</importMapping>
+                            <importMapping>ArgumentValue=io.toolforge.spi.model.ArgumentValue</importMapping>
                             <importMapping>BlobId=io.toolforge.spi.model.BlobId</importMapping>
+                            <importMapping>ContainerCursor=io.toolforge.spi.model.ContainerCursor</importMapping>
+                            <importMapping>ContainerId=io.toolforge.spi.model.ContainerId</importMapping>
+                            <importMapping>ContainerVersionCursor=io.toolforge.spi.model.ContainerVersionCursor</importMapping>
+                            <importMapping>ContainerVersionId=io.toolforge.spi.model.ContainerVersionId</importMapping>
                             <importMapping>DateExpr=io.toolforge.spi.model.DateExpr</importMapping>
                             <importMapping>ExecutionCursor=io.toolforge.spi.model.ExecutionCursor</importMapping>
                             <importMapping>ExecutionId=io.toolforge.spi.model.ExecutionId</importMapping>
+                            <importMapping>KeywordQuery=io.toolforge.spi.model.KeywordQuery</importMapping>
                             <importMapping>LogCursor=io.toolforge.spi.model.LogCursor</importMapping>
+                            <importMapping>PrefixQuery=io.toolforge.spi.model.PrefixQuery</importMapping>
+                            <importMapping>SecretCursor=io.toolforge.spi.model.SecretCursor</importMapping>
+                            <importMapping>SecretId=io.toolforge.spi.model.SecretId</importMapping>
                             <importMapping>ToolCursor=io.toolforge.spi.model.ToolCursor</importMapping>
                             <importMapping>ToolId=io.toolforge.spi.model.ToolId</importMapping>
-                            <importMapping>ToolVersion=io.toolforge.spi.model.ToolVersion</importMapping>
+                            <importMapping>ToolVersionId=io.toolforge.spi.model.ToolVersionId</importMapping>
+                            <importMapping>WorkspaceCursor=io.toolforge.spi.model.WorkspaceCursor</importMapping>
+                            <importMapping>WorkspaceId=io.toolforge.spi.model.WorkspaceId</importMapping>
+                            
                             <importMapping>InputStream=java.io.InputStream</importMapping>
-                            <importMapping>ArgumentValue=io.toolforge.spi.model.ArgumentValue</importMapping>
-                            <importMapping>KeywordQuery=io.toolforge.spi.model.KeywordQuery</importMapping>
-                            <importMapping>PrefixQuery=io.toolforge.spi.model.PrefixQuery</importMapping>
                         </importMappings>
                         <typeMappings>
                             <typeMapping>string+AccountId=AccountId</typeMapping>
@@ -153,16 +163,24 @@
                             <typeMapping>string+ApiKeyToken=ApiKeyToken</typeMapping>
                             <typeMapping>string+binary=InputStream</typeMapping>
                             <typeMapping>string+BlobId=BlobId</typeMapping>
+                            <typeMapping>string+ContainerCursor=ContainerCursor</typeMapping>
+                            <typeMapping>string+ContainerId=ContainerId</typeMapping>
+                            <typeMapping>string+ContainerVersionCursor=ContainerVersionCursor</typeMapping>
+                            <typeMapping>string+ContainerVersionId=ContainerVersionId</typeMapping>
                             <typeMapping>string+DateExpr=DateExpr</typeMapping>
                             <typeMapping>string+ExecutionCursor=ExecutionCursor</typeMapping>
                             <typeMapping>string+ExecutionId=ExecutionId</typeMapping>
                             <typeMapping>string+ExecutionCursor=ExecutionCursor</typeMapping>
+                            <typeMapping>string+KeywordQuery=KeywordQuery</typeMapping>
                             <typeMapping>string+LogCursor=LogCursor</typeMapping>
+                            <typeMapping>string+PrefixQuery=PrefixQuery</typeMapping>
+                            <typeMapping>string+SecretCursor=SecretCursor</typeMapping>
+                            <typeMapping>string+SecretId=SecretId</typeMapping>
                             <typeMapping>string+ToolCursor=ToolCursor</typeMapping>
                             <typeMapping>string+ToolId=ToolId</typeMapping>
-                            <typeMapping>string+VersionId=ToolVersion</typeMapping>
-                            <typeMapping>string+KeywordQuery=KeywordQuery</typeMapping>
-                            <typeMapping>string+PrefixQuery=PrefixQuery</typeMapping>
+                            <typeMapping>string+ToolVersionId=ToolVersionId</typeMapping>
+                            <typeMapping>string+WorkspaceCursor=WorkspaceCursor</typeMapping>
+                            <typeMapping>string+WorkspaceId=WorkspaceId</typeMapping>
                         </typeMappings>
                     </configuration>
                     <executions>

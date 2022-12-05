@@ -19,52 +19,41 @@
  */
 package io.toolforge.spi.model;
 
-import java.util.Comparator;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Objects;
-import java.util.regex.Pattern;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
-public class ToolId implements Comparable<ToolId> {
-  public static final int LENGTH = ContainerId.LENGTH;
-
-  private static final Pattern PATTERN = Pattern.compile("^[0-9a-z]{" + LENGTH + "}$");
-
-  public static ToolId of(String s) {
-    return new ToolId(s);
-  }
-
-  public static ToolId fromContainerId(ContainerId id) {
-    return fromString(id.toString());
-  }
-
+public class ContainerCursor {
   @JsonCreator
-  public static ToolId fromString(String s) {
-    return of(s);
+  public static ContainerCursor fromString(String s) {
+    return of(
+        Integer.parseInt(new String(Base64.getUrlDecoder().decode(s), StandardCharsets.UTF_8)));
   }
 
-  private final String text;
+  public static ContainerCursor of(int offset) {
+    return new ContainerCursor(offset);
+  }
 
-  public ToolId(String text) {
-    if (!PATTERN.matcher(text).matches())
-      throw new IllegalArgumentException(text);
-    this.text = text;
+  private final int offset;
+
+  public ContainerCursor(int offset) {
+    if (offset < 0)
+      throw new IllegalArgumentException("offset must not be negative");
+    this.offset = offset;
   }
 
   /**
-   * @return the text
+   * @return the offset
    */
-  private String getText() {
-    return text;
-  }
-
-  public ContainerId toContainerId() {
-    return ContainerId.fromString(toString());
+  public int getOffset() {
+    return offset;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(text);
+    return Objects.hash(offset);
   }
 
   @Override
@@ -75,20 +64,14 @@ public class ToolId implements Comparable<ToolId> {
       return false;
     if (getClass() != obj.getClass())
       return false;
-    ToolId other = (ToolId) obj;
-    return Objects.equals(text, other.text);
+    ContainerCursor other = (ContainerCursor) obj;
+    return offset == other.offset;
   }
 
   @Override
   @JsonValue
   public String toString() {
-    return getText();
-  }
-
-  public static final Comparator<ToolId> COMPARATOR = Comparator.comparing(ToolId::toString);
-
-  @Override
-  public int compareTo(ToolId that) {
-    return COMPARATOR.compare(this, that);
+    return Base64.getUrlEncoder()
+        .encodeToString(Integer.toString(getOffset()).getBytes(StandardCharsets.UTF_8));
   }
 }

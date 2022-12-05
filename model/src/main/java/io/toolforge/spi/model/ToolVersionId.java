@@ -19,52 +19,54 @@
  */
 package io.toolforge.spi.model;
 
-import java.util.Comparator;
-import java.util.Objects;
-import java.util.regex.Pattern;
+import java.util.Arrays;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import io.toolforge.spi.model.util.Hexadecimal;
 
-public class ToolId implements Comparable<ToolId> {
-  public static final int LENGTH = ContainerId.LENGTH;
+public class ToolVersionId {
+  public static final int LENGTH = 32;
 
-  private static final Pattern PATTERN = Pattern.compile("^[0-9a-z]{" + LENGTH + "}$");
-
-  public static ToolId of(String s) {
-    return new ToolId(s);
+  public static ToolVersionId of(byte[] sha256) {
+    return new ToolVersionId(sha256);
   }
 
-  public static ToolId fromContainerId(ContainerId id) {
+  public static ToolVersionId fromContainerVersionId(ContainerVersionId id) {
     return fromString(id.toString());
   }
 
   @JsonCreator
-  public static ToolId fromString(String s) {
-    return of(s);
+  public static ToolVersionId fromString(String s) {
+    return of(Hexadecimal.parseHex(s));
   }
 
-  private final String text;
+  private final byte[] sha256;
 
-  public ToolId(String text) {
-    if (!PATTERN.matcher(text).matches())
-      throw new IllegalArgumentException(text);
-    this.text = text;
+  public ToolVersionId(byte[] sha256) {
+    if (sha256 == null)
+      throw new NullPointerException();
+    if (sha256.length != LENGTH)
+      throw new IllegalArgumentException("length mismatch");
+    this.sha256 = sha256;
   }
 
   /**
-   * @return the text
+   * @return the sha256
    */
-  private String getText() {
-    return text;
+  private byte[] getSha256() {
+    return sha256;
   }
 
-  public ContainerId toContainerId() {
-    return ContainerId.fromString(toString());
+  public ContainerVersionId toContainerVersionId() {
+    return ContainerVersionId.fromString(toString());
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(text);
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + Arrays.hashCode(sha256);
+    return result;
   }
 
   @Override
@@ -75,20 +77,13 @@ public class ToolId implements Comparable<ToolId> {
       return false;
     if (getClass() != obj.getClass())
       return false;
-    ToolId other = (ToolId) obj;
-    return Objects.equals(text, other.text);
+    ToolVersionId other = (ToolVersionId) obj;
+    return Arrays.equals(sha256, other.sha256);
   }
 
   @Override
   @JsonValue
   public String toString() {
-    return getText();
-  }
-
-  public static final Comparator<ToolId> COMPARATOR = Comparator.comparing(ToolId::toString);
-
-  @Override
-  public int compareTo(ToolId that) {
-    return COMPARATOR.compare(this, that);
+    return Hexadecimal.formatHex(getSha256());
   }
 }

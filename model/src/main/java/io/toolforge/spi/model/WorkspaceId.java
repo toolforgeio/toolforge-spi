@@ -24,28 +24,29 @@ import java.util.Objects;
 import java.util.regex.Pattern;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import io.toolforge.spi.model.util.Nonces;
 
-public class ToolId implements Comparable<ToolId> {
-  public static final int LENGTH = ContainerId.LENGTH;
+public class WorkspaceId implements Comparable<WorkspaceId> {
+  public static final int LENGTH = 8;
 
   private static final Pattern PATTERN = Pattern.compile("^[0-9a-z]{" + LENGTH + "}$");
 
-  public static ToolId of(String s) {
-    return new ToolId(s);
+  public static WorkspaceId generate() {
+    return of(Nonces.nonce36(LENGTH));
   }
 
-  public static ToolId fromContainerId(ContainerId id) {
-    return fromString(id.toString());
+  public static WorkspaceId of(String s) {
+    return new WorkspaceId(s);
   }
 
   @JsonCreator
-  public static ToolId fromString(String s) {
+  public static WorkspaceId fromString(String s) {
     return of(s);
   }
 
   private final String text;
 
-  public ToolId(String text) {
+  public WorkspaceId(String text) {
     if (!PATTERN.matcher(text).matches())
       throw new IllegalArgumentException(text);
     this.text = text;
@@ -56,10 +57,6 @@ public class ToolId implements Comparable<ToolId> {
    */
   private String getText() {
     return text;
-  }
-
-  public ContainerId toContainerId() {
-    return ContainerId.fromString(toString());
   }
 
   @Override
@@ -75,7 +72,7 @@ public class ToolId implements Comparable<ToolId> {
       return false;
     if (getClass() != obj.getClass())
       return false;
-    ToolId other = (ToolId) obj;
+    WorkspaceId other = (WorkspaceId) obj;
     return Objects.equals(text, other.text);
   }
 
@@ -85,10 +82,11 @@ public class ToolId implements Comparable<ToolId> {
     return getText();
   }
 
-  public static final Comparator<ToolId> COMPARATOR = Comparator.comparing(ToolId::toString);
+  public static final Comparator<WorkspaceId> COMPARATOR =
+      Comparator.comparing(WorkspaceId::toString);
 
   @Override
-  public int compareTo(ToolId that) {
+  public int compareTo(WorkspaceId that) {
     return COMPARATOR.compare(this, that);
   }
 }

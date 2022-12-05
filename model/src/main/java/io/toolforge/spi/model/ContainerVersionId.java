@@ -24,21 +24,21 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import io.toolforge.spi.model.util.Hexadecimal;
 
-public class ToolVersion {
+public class ContainerVersionId {
   public static final int LENGTH = 32;
 
-  public static ToolVersion of(byte[] sha256) {
-    return new ToolVersion(sha256);
+  public static ContainerVersionId of(byte[] sha256) {
+    return new ContainerVersionId(sha256);
   }
 
   @JsonCreator
-  public static ToolVersion fromString(String s) {
+  public static ContainerVersionId fromString(String s) {
     return of(Hexadecimal.parseHex(s));
   }
 
   private final byte[] sha256;
 
-  public ToolVersion(byte[] sha256) {
+  public ContainerVersionId(byte[] sha256) {
     if (sha256 == null)
       throw new NullPointerException();
     if (sha256.length != LENGTH)
@@ -69,7 +69,7 @@ public class ToolVersion {
       return false;
     if (getClass() != obj.getClass())
       return false;
-    ToolVersion other = (ToolVersion) obj;
+    ContainerVersionId other = (ContainerVersionId) obj;
     return Arrays.equals(sha256, other.sha256);
   }
 

@@ -19,52 +19,42 @@
  */
 package io.toolforge.spi.model;
 
-import java.util.Comparator;
+import static java.util.Objects.requireNonNull;
 import java.util.Objects;
-import java.util.regex.Pattern;
+import java.util.UUID;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
-public class ToolId implements Comparable<ToolId> {
-  public static final int LENGTH = ContainerId.LENGTH;
-
-  private static final Pattern PATTERN = Pattern.compile("^[0-9a-z]{" + LENGTH + "}$");
-
-  public static ToolId of(String s) {
-    return new ToolId(s);
-  }
-
-  public static ToolId fromContainerId(ContainerId id) {
-    return fromString(id.toString());
+public class SecretVersionId {
+  public static SecretVersionId generate() {
+    return of(UUID.randomUUID());
   }
 
   @JsonCreator
-  public static ToolId fromString(String s) {
-    return of(s);
+  public static SecretVersionId fromString(String s) {
+    return of(UUID.fromString(s));
   }
 
-  private final String text;
+  public static SecretVersionId of(UUID uuid) {
+    return new SecretVersionId(uuid);
+  }
 
-  public ToolId(String text) {
-    if (!PATTERN.matcher(text).matches())
-      throw new IllegalArgumentException(text);
-    this.text = text;
+  private final UUID uuid;
+
+  public SecretVersionId(UUID uuid) {
+    this.uuid = requireNonNull(uuid);
   }
 
   /**
-   * @return the text
+   * @return the uuid
    */
-  private String getText() {
-    return text;
-  }
-
-  public ContainerId toContainerId() {
-    return ContainerId.fromString(toString());
+  public UUID getUuid() {
+    return uuid;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(text);
+    return Objects.hash(uuid);
   }
 
   @Override
@@ -75,20 +65,13 @@ public class ToolId implements Comparable<ToolId> {
       return false;
     if (getClass() != obj.getClass())
       return false;
-    ToolId other = (ToolId) obj;
-    return Objects.equals(text, other.text);
+    SecretVersionId other = (SecretVersionId) obj;
+    return Objects.equals(uuid, other.uuid);
   }
 
   @Override
   @JsonValue
   public String toString() {
-    return getText();
-  }
-
-  public static final Comparator<ToolId> COMPARATOR = Comparator.comparing(ToolId::toString);
-
-  @Override
-  public int compareTo(ToolId that) {
-    return COMPARATOR.compare(this, that);
+    return getUuid().toString();
   }
 }
