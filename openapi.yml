@@ -1717,7 +1717,7 @@ components:
           properties:
             default:
               type: boolean
-            
+
     Slot:
       type: object
       required:
@@ -1759,6 +1759,11 @@ components:
           items:
             $ref: '#/components/schemas/ContainerVersionSecret'
 
+    ManifestType:
+      type: string
+      enum:
+        - tool
+
     Manifest:
       type: object
       required:
@@ -1770,30 +1775,42 @@ components:
           # 1.0 for now
           type: string
           format: ManifestVersion
-        tool:
+        container:
           type: string
-          format: ToolId
+          format: ContainerId
+        type:
+          $ref: '#/components/schemas/ManifestType'
         environment:
           $ref: '#/components/schemas/ManifestEnvironment'
         # TODO cost? or is that in tool?
-        parameters:
-          type: array
-          minLength: 0
-          maxLength: 10
-          items:
-            $ref: '#/components/schemas/ParameterDefinition'
-        inputs:
-          type: array
-          minLength: 0
-          maxLength: 10
-          items:
-            $ref: '#/components/schemas/Slot'
-        outputs:
-          type: array
-          minLength: 0
-          maxLength: 10
-          items:
-            $ref: '#/components/schemas/Slot'
+      discriminator:
+        propertyName: type
+        mapping:
+          tool: '#/components/schemas/ToolManifest'
+
+    ToolManifest:
+      allOf:
+        - $ref: '#/components/schemas/Manifest'
+        - type: object
+          properties:
+            parameters:
+              type: array
+              minLength: 0
+              maxLength: 10
+              items:
+                $ref: '#/components/schemas/ParameterDefinition'
+            inputs:
+              type: array
+              minLength: 0
+              maxLength: 10
+              items:
+                $ref: '#/components/schemas/Slot'
+            outputs:
+              type: array
+              minLength: 0
+              maxLength: 10
+              items:
+                $ref: '#/components/schemas/Slot'
             
     Parameter:
       type: object
