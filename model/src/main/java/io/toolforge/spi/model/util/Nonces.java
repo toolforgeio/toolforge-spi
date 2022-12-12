@@ -27,6 +27,34 @@ public final class Nonces {
   private static final SecureRandom RANDOM = new SecureRandom();
 
   /**
+   * Generates a random base16 nonce string of the given length
+   */
+  public static String nonce16(int length) {
+    if (length < 0)
+      throw new IllegalArgumentException("length must not be negative");
+    StringBuilder result = new StringBuilder(length);
+    while (result.length() < length) {
+      result.append(base16());
+    }
+    return result.toString();
+  }
+
+  private static char base16() {
+    char result;
+
+    int n = RANDOM.nextInt(16);
+    if (n >= 0 && n < 10) {
+      result = (char) ('0' + (n - 0));
+    } else if (n >= 10 && n < 16) {
+      result = (char) ('a' + (n - 10));
+    } else {
+      throw new AssertionError(n);
+    }
+
+    return result;
+  }
+
+  /**
    * Generates a random base36 nonce string of the given length
    */
   public static String nonce36(int length) {
