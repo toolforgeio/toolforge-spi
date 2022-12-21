@@ -24,37 +24,51 @@ import java.util.Objects;
 import java.util.regex.Pattern;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
-import io.toolforge.spi.model.util.Nonces;
 
-public class AccountId implements Comparable<AccountId> {
-  public static final int LENGTH = 8;
+public class HumanName implements Comparable<HumanName> {
+  private static final int MAX_LENGTH = 80;
 
-  private static final Pattern PATTERN = Pattern.compile("^[0-9a-z]{" + LENGTH + "}$");
+  public static class TooLongException extends IllegalArgumentException {
+    private static final long serialVersionUID = 7831959129690740413L;
 
-  public static AccountId generate() {
-    return of(Nonces.nonce36(LENGTH));
+    public TooLongException() {
+      super("Names can have at most " + MAX_LENGTH + " characters.");
+    }
   }
 
-  public static AccountId of(String s) {
-    return new AccountId(s);
+  private static final Pattern PATTERN =
+      Pattern.compile("^[\\p{L}\\p{M}\\p{S}\\p{N}\\p{P}][\\p{L}\\p{M}\\p{S}\\p{N}\\p{P}\\p{Zs}]*$");
+
+  // TODO We probably need better error messages...
+  public static class InvalidHumanNameException extends IllegalArgumentException {
+    private static final long serialVersionUID = 2566863250255977559L;
+
+    public InvalidHumanNameException() {
+      super("The human name is not valid.");
+    }
+  }
+
+  public static HumanName of(String text) {
+    return new HumanName(text);
   }
 
   @JsonCreator
-  public static AccountId fromString(String s) {
-    return of(s);
+  public static HumanName fromString(String text) {
+    return of(text);
   }
 
   private final String text;
 
-  public AccountId(String text) {
+  public HumanName(String text) {
+    if (text == null)
+      throw new NullPointerException();
+    if (text.length() > MAX_LENGTH)
+      throw new TooLongException();
     if (!PATTERN.matcher(text).matches())
-      throw new IllegalArgumentException(text);
+      throw new InvalidHumanNameException();
     this.text = text;
   }
 
-  /**
-   * @return the text
-   */
   private String getText() {
     return text;
   }
@@ -72,7 +86,7 @@ public class AccountId implements Comparable<AccountId> {
       return false;
     if (getClass() != obj.getClass())
       return false;
-    AccountId other = (AccountId) obj;
+    HumanName other = (HumanName) obj;
     return Objects.equals(text, other.text);
   }
 
@@ -82,10 +96,10 @@ public class AccountId implements Comparable<AccountId> {
     return getText();
   }
 
-  public static final Comparator<AccountId> COMPARATOR = Comparator.comparing(AccountId::toString);
+  public static final Comparator<HumanName> COMPARATOR = Comparator.comparing(HumanName::toString);
 
   @Override
-  public int compareTo(AccountId that) {
+  public int compareTo(HumanName that) {
     return COMPARATOR.compare(this, that);
   }
 }

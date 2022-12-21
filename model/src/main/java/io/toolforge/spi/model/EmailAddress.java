@@ -24,37 +24,51 @@ import java.util.Objects;
 import java.util.regex.Pattern;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
-import io.toolforge.spi.model.util.Nonces;
 
-public class AccountId implements Comparable<AccountId> {
-  public static final int LENGTH = 8;
+public class EmailAddress implements Comparable<EmailAddress> {
+  private static final int MAX_LENGTH = 320;
 
-  private static final Pattern PATTERN = Pattern.compile("^[0-9a-z]{" + LENGTH + "}$");
+  public static class TooLongException extends IllegalArgumentException {
+    private static final long serialVersionUID = 7831959129690740413L;
 
-  public static AccountId generate() {
-    return of(Nonces.nonce36(LENGTH));
+    public TooLongException() {
+      super("Email addresses can have at most " + MAX_LENGTH + " characters.");
+    }
   }
 
-  public static AccountId of(String s) {
-    return new AccountId(s);
+  private static final Pattern PATTERN = Pattern.compile(
+      "^[-a-zA-Z0-9_]+(?:[.][-a-zA-Z0-9_]+)*(?:[+][-a-zA-Z0-9_]+)?@(?:[a-zA-Z0-9-]+[.])+[a-zA-Z]{2,7}$");
+
+  // TODO We probably need better error messages...
+  public static class InvalidEmailAddressException extends IllegalArgumentException {
+    private static final long serialVersionUID = 2566863250255977559L;
+
+    public InvalidEmailAddressException() {
+      super("The email address is not valid.");
+    }
+  }
+
+  public static EmailAddress of(String text) {
+    return new EmailAddress(text);
   }
 
   @JsonCreator
-  public static AccountId fromString(String s) {
-    return of(s);
+  public static EmailAddress fromString(String text) {
+    return of(text);
   }
 
   private final String text;
 
-  public AccountId(String text) {
+  public EmailAddress(String text) {
+    if (text == null)
+      throw new NullPointerException();
+    if (text.length() > MAX_LENGTH)
+      throw new TooLongException();
     if (!PATTERN.matcher(text).matches())
-      throw new IllegalArgumentException(text);
-    this.text = text;
+      throw new InvalidEmailAddressException();
+    this.text = text.toLowerCase();
   }
 
-  /**
-   * @return the text
-   */
   private String getText() {
     return text;
   }
@@ -72,7 +86,7 @@ public class AccountId implements Comparable<AccountId> {
       return false;
     if (getClass() != obj.getClass())
       return false;
-    AccountId other = (AccountId) obj;
+    EmailAddress other = (EmailAddress) obj;
     return Objects.equals(text, other.text);
   }
 
@@ -82,10 +96,11 @@ public class AccountId implements Comparable<AccountId> {
     return getText();
   }
 
-  public static final Comparator<AccountId> COMPARATOR = Comparator.comparing(AccountId::toString);
+  public static final Comparator<EmailAddress> COMPARATOR =
+      Comparator.comparing(EmailAddress::toString);
 
   @Override
-  public int compareTo(AccountId that) {
+  public int compareTo(EmailAddress that) {
     return COMPARATOR.compare(this, that);
   }
 }

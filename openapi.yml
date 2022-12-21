@@ -230,15 +230,15 @@ paths:
         404:
           $ref: '#/components/responses/NotFound'
 
-  /accounts/by/username/{accountUsername}:
+  /accounts/by/username/{username}:
     parameters:
-      - name: accountUsername
+      - name: username
         in: path
         description: The username of the account to retrieve
         required: true
         schema:
           type: string
-          format: AccountUsername
+          format: Username
     get:
       tags:
         - account
@@ -1289,7 +1289,7 @@ components:
           format: AccountId
         username:
           type: string
-          format: AccountUsername
+          format: Username
         picture:
           type: string
           format: url
@@ -1303,6 +1303,7 @@ components:
           properties:
             name:
               type: string
+              format: HumanName
             email:
               type: string
               format: EmailAddress
