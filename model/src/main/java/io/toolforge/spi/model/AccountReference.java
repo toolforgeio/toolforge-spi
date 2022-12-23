@@ -37,7 +37,7 @@ public class AccountReference {
   }
 
   private static final Pattern PATTERN =
-      Pattern.compile("^(?:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}|me)$");
+      Pattern.compile("^(?:[a-z0-9]{"+AccountId.LENGTH+"}|me)$");
 
   private final String text;
 
