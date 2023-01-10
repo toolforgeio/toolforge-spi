@@ -25,6 +25,9 @@ import java.util.regex.Pattern;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
+/**
+ * Usernames are treated case-insensitively.
+ */
 public class Username implements Comparable<Username> {
   private static final int MAX_LENGTH = 39;
 

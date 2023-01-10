@@ -21,10 +21,14 @@ package io.toolforge.spi.model;
 
 import java.util.Comparator;
 import java.util.Objects;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
+/**
+ * Email addresses are treated case-insensitively.
+ */
 public class EmailAddress implements Comparable<EmailAddress> {
   private static final int MAX_LENGTH = 320;
 
@@ -36,8 +40,14 @@ public class EmailAddress implements Comparable<EmailAddress> {
     }
   }
 
-  private static final Pattern PATTERN = Pattern.compile(
-      "^[-a-zA-Z0-9_]+(?:[.][-a-zA-Z0-9_]+)*(?:[+][-a-zA-Z0-9_]+)?@(?:[a-zA-Z0-9-]+[.])+[a-zA-Z]{2,7}$");
+  private static final Pattern LOCAL_PART_PATTERN =
+      Pattern.compile("[-a-zA-Z0-9_]+(?:[.][-a-zA-Z0-9_]+)*(?:[+][-a-zA-Z0-9_]+)?");
+
+  private static final Pattern DOMAIN_PATTERN =
+      Pattern.compile("(?:[a-zA-Z0-9-]+[.])+[a-zA-Z]{2,7}");
+
+  private static final Pattern ADDRESS_PATTERN =
+      Pattern.compile("(" + LOCAL_PART_PATTERN.pattern() + ")@(" + DOMAIN_PATTERN.pattern() + ")");
 
   // TODO We probably need better error messages...
   public static class InvalidEmailAddressException extends IllegalArgumentException {
@@ -57,25 +67,44 @@ public class EmailAddress implements Comparable<EmailAddress> {
     return of(text);
   }
 
-  private final String text;
+  private final String localPart;
+  private final String domain;
 
   public EmailAddress(String text) {
     if (text == null)
       throw new NullPointerException();
     if (text.length() > MAX_LENGTH)
       throw new TooLongException();
-    if (!PATTERN.matcher(text).matches())
+
+    Matcher m = ADDRESS_PATTERN.matcher(text);
+    if (!m.matches())
       throw new InvalidEmailAddressException();
-    this.text = text.toLowerCase();
+
+    this.localPart = m.group(1).toLowerCase();
+    this.domain = m.group(2).toLowerCase();
   }
 
-  private String getText() {
-    return text;
+  public EmailAddress(String localPart, String domain) {
+    this(localPart + "@" + domain);
+  }
+
+  /**
+   * @return the localPart
+   */
+  public String getLocalPart() {
+    return localPart;
+  }
+
+  /**
+   * @return the domain
+   */
+  public String getDomain() {
+    return domain;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(text);
+    return Objects.hash(domain, localPart);
   }
 
   @Override
@@ -87,13 +116,13 @@ public class EmailAddress implements Comparable<EmailAddress> {
     if (getClass() != obj.getClass())
       return false;
     EmailAddress other = (EmailAddress) obj;
-    return Objects.equals(text, other.text);
+    return Objects.equals(domain, other.domain) && Objects.equals(localPart, other.localPart);
   }
 
   @Override
   @JsonValue
   public String toString() {
-    return getText();
+    return getLocalPart() + "@" + getDomain();
   }
 
   public static final Comparator<EmailAddress> COMPARATOR =
