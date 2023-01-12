@@ -4,7 +4,7 @@ info:
   description: ToolForge is the self-serve tools platform for teams
   contact:
     email: api@toolforge.io
-  version: 0.0.17
+  version: 0.0.29
 servers:
   - url: https://api.toolforge.io/v1
 tags:
@@ -1090,7 +1090,7 @@ paths:
         content:
           'application/json':
             schema:
-              $ref: '#/components/schemas/Invocation'
+              $ref: '#/components/schemas/ToolInvocation'
       responses:
         201:
           description: The execution was created successfully.
@@ -2312,7 +2312,7 @@ components:
               type: string
               format: BlobId
     
-    InvocationInput:
+    ToolInvocationInput:
       type: object
       properties:
         name:
@@ -2322,7 +2322,7 @@ components:
         data:
           $ref: '#/components/schemas/InvocationData'
             
-    Invocation:
+    ToolInvocation:
       type: object
       properties:
         arguments:
@@ -2332,7 +2332,7 @@ components:
         inputs:
           type: array
           items:
-            $ref: '#/components/schemas/InvocationInput'
+            $ref: '#/components/schemas/ToolInvocationInput'
             
     LogEntry:
       type: object
