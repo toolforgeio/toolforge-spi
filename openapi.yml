@@ -4,7 +4,7 @@ info:
   description: ToolForge is the self-serve tools platform for teams
   contact:
     email: api@toolforge.io
-  version: 0.0.29
+  version: 0.0.30
 servers:
   - url: https://api.toolforge.io/v1
 tags:
@@ -438,6 +438,54 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ContainerVersion'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+  /containers/{containerId}/versions/{containerVersion}/release:
+    parameters:
+      - $ref: '#/components/parameters/containerId'
+      - $ref: '#/components/parameters/containerVersion'
+    post:
+      tags:
+        - container
+      summary: Release container version
+      description: Sets the given container's current version to the given version
+      operationId: releaseContainerVersion
+      responses:
+        200:
+          description: The container version was released successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContainerVersion'
+        400:
+          $ref: '#/components/responses/BadRequest'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+  /containers/{containerId}/versions/{containerVersion}/deprecate:
+    parameters:
+      - $ref: '#/components/parameters/containerId'
+      - $ref: '#/components/parameters/containerVersion'
+    post:
+      tags:
+        - container
+      summary: Deprecate container version
+      description: Deprecates the given version of the given tool.
+      operationId: deprecateContainerVersion
+      responses:
+        200:
+          description: The container version was deprecated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContainerVersion'
+        400:
+          $ref: '#/components/responses/BadRequest'
         403:
           $ref: '#/components/responses/Forbidden'
         404:
@@ -1153,6 +1201,12 @@ components:
   responses:
     Processing:
       description: The requested data is still processing and is not ready yet.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ErrorMessage'
+    BadRequest:
+      description: The given request could not be satisfied because it's invalid.
       content:
         application/problem+json:
           schema:
@@ -1905,7 +1959,7 @@ components:
           properties:
             default:
               type: boolean
-            
+              
     ContainerDefinition:
       type: object
       required:
@@ -2038,9 +2092,14 @@ components:
         owner:
           type: string
           format: AccountId
-        currentVersion:
-          type: string
-          format: ContainerVersionId
+          
+    ContainerVersionState:
+      type: string
+      enum:
+        - ready
+        - current
+        - deprecated
+        - retired
           
     ContainerVersionDescription:
       type: object
@@ -2051,6 +2110,8 @@ components:
         createdAt:
           type: string
           format: date-time
+        state:
+          $ref: '#/components/schemas/ContainerVersionState'
         creator:
           $ref: '#/components/schemas/AccountPreview'
 
