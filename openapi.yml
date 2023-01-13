@@ -4,7 +4,7 @@ info:
   description: ToolForge is the self-serve tools platform for teams
   contact:
     email: api@toolforge.io
-  version: 0.0.30
+  version: 0.0.31
 servers:
   - url: https://api.toolforge.io/v1
 tags:
@@ -386,6 +386,34 @@ paths:
         404:
           $ref: '#/components/responses/NotFound'
 
+  /containers/{containerId}/install:
+    parameters:
+      - $ref: '#/components/parameters/containerId'
+    post:
+      tags:
+        - container
+      summary: Install current version of container
+      description: Installs the current version of the given container into client's environment
+      operationId: installContainer
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/ContainerInstallation'
+      responses:
+        200:
+          description: The container was installed successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstalledContainer'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        404:
+          $ref: '#/components/responses/NotFound'
+        409:
+          $ref: '#/components/responses/Conflict'
+
   /containers/{containerId}/versions:
     parameters:
       - $ref: '#/components/parameters/containerId'
@@ -694,6 +722,8 @@ paths:
           description: The secret was deleted successfully.
         403:
           $ref: '#/components/responses/Forbidden'
+        409:
+          $ref: '#/components/responses/Conflict'
 
   /workspaces/{workspaceId}/executions:
     parameters:
@@ -1002,25 +1032,6 @@ paths:
   /workspaces/{workspaceId}/tools:
     parameters:
       - $ref: '#/components/parameters/workspaceId'
-    post:
-      tags:
-        - workspace
-        - tool
-      summary: Install tool into workspace
-      description: Install the given tool into the given workspace
-      operationId: createWorkspaceTool
-      requestBody:
-        content:
-          'application/json':
-            schema:
-              $ref: '#/components/schemas/ToolInstallation'
-      responses:
-        200:
-          description: The tool was installed successfully
-          content:
-            'application/json':
-              schema:
-                $ref: '#/components/schemas/Tool'
     get:
       tags:
         - workspace
@@ -1105,22 +1116,6 @@ paths:
             'application/json':
               schema:
                 $ref: '#/components/schemas/Tool'
-    delete:
-      tags:
-        - workspace
-        - tool
-      summary: Delete tool from workspace
-      description: Get the given tool in the workspace
-      operationId: deleteWorkspaceTool
-      responses:
-        204:
-          description: The tool was deleted successfully
-          content:
-            'application/json':
-              schema:
-                $ref: '#/components/schemas/Tool'
-        409:
-          $ref: '#/components/responses/Conflict'
 
   /workspaces/{workspaceId}/tools/{toolId}/execute:
     parameters:
@@ -1131,9 +1126,9 @@ paths:
         - tool
         - workspace
         - execution
-      summary: Execute latest tool version
-      description: Execute the latest version of the given tool
-      operationId: executeLatestToolVersion
+      summary: Execute tool
+      description: Execute the current version of the given tool
+      operationId: executeWorkspaceTool
       requestBody:
         content:
           'application/json':
@@ -1148,6 +1143,8 @@ paths:
                 $ref: '#/components/schemas/Execution'
         403:
           $ref: '#/components/responses/Forbidden'
+        409:
+          $ref: '#/components/responses/Conflict'
         404:
           $ref: '#/components/responses/NotFound'
 
@@ -1814,7 +1811,7 @@ components:
           items:
             $ref: '#/components/schemas/ContainerVersionSecret'
 
-    ManifestType:
+    ContainerType:
       type: string
       enum:
         - tool
@@ -1823,7 +1820,8 @@ components:
       type: object
       required:
         - toolforge
-        - tool
+        - type
+        - container
         - environment
       properties:
         toolforge:
@@ -1834,7 +1832,7 @@ components:
           type: string
           format: ContainerId
         type:
-          $ref: '#/components/schemas/ManifestType'
+          $ref: '#/components/schemas/ContainerType'
         environment:
           $ref: '#/components/schemas/ManifestEnvironment'
         # TODO cost? or is that in tool?
@@ -1963,9 +1961,12 @@ components:
     ContainerDefinition:
       type: object
       required:
+        - type
         - name
         - description
       properties:
+        type:
+          $ref: '#/components/schemas/ContainerType'
         name:
           type: string
         description:
@@ -2029,11 +2030,14 @@ components:
     ContainerPreview:
       type: object
       required:
+        - type
         - id
         - owner
         - name
         - slug
       properties:
+        type:
+          $ref: '#/components/schemas/ContainerType'
         id:
           type: string
           format: ContainerId
@@ -2165,7 +2169,19 @@ components:
           type: string
           format: ContainerVersionCursor
           
-    ToolInstallationVariable:
+    ContainerInstallation:
+      type: object
+      required:
+        - type
+      properties:
+        type:
+          $ref: '#/components/schemas/ContainerType'
+      discriminator:
+        propertyName: type
+        mapping:
+          tool: '#/components/schemas/ToolContainerInstallation'
+          
+    ToolContainerInstallationVariable:
       type: object
       required:
         - name
@@ -2177,7 +2193,7 @@ components:
         value:
           type: string
           
-    ToolInstallationSecret:
+    ToolContainerInstallationSecret:
       type: object
       required:
         - name
@@ -2190,24 +2206,53 @@ components:
           type: string
           format: SecretId
           
-    ToolInstallation:
+    ToolContainerInstallation:
+      allOf:
+        - $ref: '#/components/schemas/ContainerInstallation'
+        - type: object
+          required:
+            - workspace
+          properties:
+            workspace:
+              type: string
+              format: WorkspaceId
+            variables:
+              type: array
+              minLength: 1
+              maxLength: 10
+              items:
+                $ref: '#/components/schemas/ToolContainerInstallationVariable'
+            secrets:
+              type: array
+              minLength: 1
+              maxLength: 10
+              items:
+                $ref: '#/components/schemas/ToolContainerInstallationSecret'
+            
+    InstalledContainer:
       type: object
       properties:
+        type:
+          $ref: '#/components/schemas/ContainerType'
         container:
-          type: string
-          format: ContainerId
-        variables:
-          type: array
-          minLength: 1
-          maxLength: 10
-          items:
-            $ref: '#/components/schemas/ToolInstallationVariable'
-        secrets:
-          type: array
-          minLength: 1
-          maxLength: 10
-          items:
-            $ref: '#/components/schemas/ToolInstallationSecret'
+          $ref: '#/components/schemas/ContainerPreview'
+      discriminator:
+        propertyName: type
+        mapping:
+          tool: '#/components/schemas/ToolInstalledContainer'
+          
+    ToolInstalledContainer:
+      allOf:
+        - $ref: '#/components/schemas/InstalledContainer'
+        - type: object
+          required:
+            - workspace
+            - tool
+          properties:
+            workspace:
+              $ref: '#/components/schemas/WorkspacePreview'
+            tool:
+              $ref: '#/components/schemas/Tool'
 
     ToolListOrdering:
       type: string
@@ -2274,7 +2319,7 @@ components:
           type: string
         slug:
           type: string
-      
+
     ToolDescription:
       allOf:
         - $ref: '#/components/schemas/ToolPreview'
@@ -2301,6 +2346,8 @@ components:
         - $ref: '#/components/schemas/ToolDescription'
         - type: object
           properties:
+            container:
+              $ref: '#/components/schemas/ContainerPreview'
             parameters:
               type: array
               items:
