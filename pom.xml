@@ -200,6 +200,7 @@
                                 <generateApis>false</generateApis>
                                 <generateModels>false</generateModels>
                                 <generateSupportingFiles>false</generateSupportingFiles>
+                                <templateDirectory>${project.basedir}/openapi/templates</templateDirectory>
                                 <configOptions>
                                     <apiPackage>io.toolforge.spi.service</apiPackage>
                                     <modelPackage>io.toolforge.spi.model</modelPackage>
