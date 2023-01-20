@@ -4,7 +4,7 @@ info:
   description: ToolForge is the self-serve tools platform for teams
   contact:
     email: api@toolforge.io
-  version: 0.0.33
+  version: 0.0.35
 servers:
   - url: https://api.toolforge.io/v1
 tags:
@@ -2608,6 +2608,9 @@ components:
       type: object
       description: A one-time password for docker login
       properties:
+        username:
+          type: string
+          format: Username
         password:
           type: string
           format: password
