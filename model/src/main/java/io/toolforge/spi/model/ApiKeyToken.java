@@ -98,4 +98,13 @@ public class ApiKeyToken {
   public String toString() {
     return PREFIX + getBody();
   }
+
+  public static void main(String[] args) {
+    ApiKeyToken token = ApiKeyToken.generate();
+    ApiKeyId id = ApiKeyId.fromToken(token);
+    ApiKeyHint hint = ApiKeyHint.fromToken(token);
+    System.out.println("Token: " + token);
+    System.out.println("ID:    " + id);
+    System.out.println("Hint:  " + hint);
+  }
 }
