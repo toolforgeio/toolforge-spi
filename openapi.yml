@@ -4,7 +4,7 @@ info:
   description: ToolForge is the self-serve tools platform for teams
   contact:
     email: api@toolforge.io
-  version: 0.0.35
+  version: 0.0.36
 servers:
   - url: https://api.toolforge.io/v1
 tags:
@@ -414,6 +414,32 @@ paths:
         409:
           $ref: '#/components/responses/Conflict'
 
+  /containers/{containerId}/transfer:
+    parameters:
+      - $ref: '#/components/parameters/containerId'
+    post:
+      tags:
+        - container
+      summary: Transfer container ownership
+      description: Assign ownership of this container to another user
+      operationId: transferContainer
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/ContainerTransfer'
+      responses:
+        200:
+          description: The container was installed successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Container'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        404:
+          $ref: '#/components/responses/NotFound'
+
   /containers/{containerId}/versions:
     parameters:
       - $ref: '#/components/parameters/containerId'
@@ -725,6 +751,34 @@ paths:
         409:
           $ref: '#/components/responses/Conflict'
 
+  /workspaces/{workspaceId}/secrets/{secretId}/transfer:
+    parameters:
+      - $ref: '#/components/parameters/workspaceId'
+      - $ref: '#/components/parameters/secretId'
+    post:
+      tags:
+        - workspace
+        - secret
+      summary: Transfer workspace secret ownership
+      description: Transfer this workspace secret to another owner
+      operationId: transferWorkspaceSecret
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/SecretTransfer'
+      responses:
+        200:
+          description: The secret was transferred successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Secret'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        404:
+          $ref: '#/components/responses/NotFound'
+
   /workspaces/{workspaceId}/executions:
     parameters:
       - $ref: '#/components/parameters/workspaceId'
@@ -1001,7 +1055,35 @@ paths:
                 $ref: '#/components/schemas/ErrorMessage'
         410:
           $ref: '#/components/responses/Gone'
-         
+
+  /workspaces/{workspaceId}/executions/{executionId}/transfer:
+    parameters:
+      - $ref: '#/components/parameters/workspaceId'
+      - $ref: '#/components/parameters/executionId'
+    post:
+      tags:
+        - workspace
+        - execution
+      summary: Transfer execution ownership
+      description: Assign ownership of this execution to another user
+      operationId: transferExecution
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/ExecutionTransfer'
+      responses:
+        200:
+          description: The execution was transferred successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Execution'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        404:
+          $ref: '#/components/responses/NotFound'
+
   /workspaces/{workspaceId}/executions/{executionId}/cancel:
     parameters:
       - $ref: '#/components/parameters/workspaceId'
@@ -1116,6 +1198,38 @@ paths:
             'application/json':
               schema:
                 $ref: '#/components/schemas/Tool'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        404:
+          $ref: '#/components/responses/NotFound'
+
+  /workspaces/{workspaceId}/tools/{toolId}/transfer:
+    parameters:
+      - $ref: '#/components/parameters/workspaceId'
+      - $ref: '#/components/parameters/toolId'
+    post:
+      tags:
+        - workspace
+        - tool
+      summary: Transfer tool ownership
+      description: Assign ownership of this tool to another user
+      operationId: transferWorkspaceTool
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/ToolTransfer'
+      responses:
+        200:
+          description: The tool was transferred successfully
+          content:
+            'application/json':
+              schema:
+                $ref: '#/components/schemas/Tool'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        404:
+          $ref: '#/components/responses/NotFound'
 
   /workspaces/{workspaceId}/tools/{toolId}/execute:
     parameters:
@@ -1455,6 +1569,15 @@ components:
               type: string
               format: markdown
               
+    SecretTransfer:
+      type: object
+      required:
+        - owner
+      properties:
+        owner:
+          type: string
+          format: AccountId
+
     SecretUpdate:
       type: object
       properties:
@@ -1463,9 +1586,6 @@ components:
         description:
           type: string
           format: markdown
-        owner:
-          type: string
-          format: AccountId
         value:
           type: string
 
@@ -1957,6 +2077,15 @@ components:
           properties:
             default:
               type: boolean
+
+    ContainerTransfer:
+      type: object
+      required:
+        - owner
+      properties:
+        owner:
+          type: string
+          format: AccountId
               
     ContainerDefinition:
       type: object
@@ -2093,10 +2222,7 @@ components:
         description:
           type: string
           format: markdown
-        owner:
-          type: string
-          format: AccountId
-          
+
     ContainerVersionState:
       type: string
       enum:
@@ -2261,6 +2387,15 @@ components:
         - lastExecutedByMeAt
         - name
 
+    ToolTransfer:
+      type: object
+      required:
+        - owner
+      properties:
+        owner:
+          type: string
+          format: AccountId
+          
     ToolUpdateVariable:
       type: object
       required:
@@ -2287,9 +2422,6 @@ components:
     ToolUpdate:
       type: object
       properties:
-        owner:
-          type: string
-          format: AccountId
         variables:
           type: array
           items:
@@ -2481,14 +2613,20 @@ components:
         # The execution was cancelled by the user.
         - cancelled
 
+    ExecutionTransfer:
+      type: object
+      required:
+        - owner
+      properties:
+        owner:
+          type: string
+          format: AccountId
+          
     ExecutionUpdate:
       type: object
       properties:
         name:
           type: string
-        owner:
-          type: string
-          format: AccountId
 
     ExecutionDescription:
       type: object
