@@ -4,7 +4,7 @@ info:
   description: ToolForge is the self-serve tools platform for teams
   contact:
     email: api@toolforge.io
-  version: 0.0.36
+  version: 0.0.37
 servers:
   - url: https://api.toolforge.io/v1
 tags:
@@ -296,6 +296,13 @@ paths:
             type: string
             format: KeywordQuery
             example: twitter account
+        - name: owner
+          in: query
+          description: A reference to the container owner
+          schema:
+            type: string
+            format: AccountReference
+            example: me
         - name: limit
           in: query
           description: The maximum number of containers to return per page
@@ -336,12 +343,47 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Container'
-        422:
-          description: The container could not be created. Is the name unique?
+        403:
+          $ref: '#/components/responses/Forbidden'
+        409:
+          $ref: '#/components/responses/Conflict'
+
+
+  /containers/by/owner/{owner}/slug/{slug}:
+    parameters:
+      - name: owner
+        in: path
+        required: true
+        description: The container's owner
+        schema:
+          type: string
+          format: AccountReference
+          example: me
+      - name: slug
+        in: path
+        required: true
+        description: The slug of the container to get
+        schema:
+          type: string
+          format: ContainerSlug
+          example: container-slug
+    get:
+      tags:
+        - container
+      summary: Get container by owner's username and slug
+      description: Get metadata about one container
+      operationId: findContainerByOwnerSlug
+      responses:
+        200:
+          description: The container was found successfully.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorMessage'
+                $ref: '#/components/schemas/Container'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        404:
+          $ref: '#/components/responses/NotFound'
                 
   /containers/{containerId}:
     parameters:
@@ -385,6 +427,8 @@ paths:
           $ref: '#/components/responses/Forbidden'
         404:
           $ref: '#/components/responses/NotFound'
+        409:
+          $ref: '#/components/responses/Conflict'
 
   /containers/{containerId}/install:
     parameters:
@@ -439,6 +483,8 @@ paths:
           $ref: '#/components/responses/Forbidden'
         404:
           $ref: '#/components/responses/NotFound'
+        409:
+          $ref: '#/components/responses/Conflict'
 
   /containers/{containerId}/versions:
     parameters:
@@ -583,6 +629,7 @@ paths:
           schema:
             type: string
             format: AccountReference
+            example: me
         - name: limit
           in: query
           description: The maximum number of executions to return per page
@@ -649,6 +696,8 @@ paths:
                 $ref: '#/components/schemas/Secret'
         403:
           $ref: '#/components/responses/Forbidden'
+        409:
+          $ref: '#/components/responses/Conflict'
     get:
       tags:
         - workspace
@@ -670,6 +719,7 @@ paths:
           schema:
             type: string
             format: AccountReference
+            example: me
         - name: limit
           in: query
           description: The maximum number of executions to return per page
@@ -736,6 +786,8 @@ paths:
           $ref: '#/components/responses/Forbidden'
         404:
           $ref: '#/components/responses/NotFound'
+        409:
+          $ref: '#/components/responses/Conflict'
     delete:
       tags:
         - workspace
@@ -751,6 +803,35 @@ paths:
         409:
           $ref: '#/components/responses/Conflict'
 
+
+  /workspaces/{workspaceId}/secrets/by/name/{name}:
+    parameters:
+      - $ref: '#/components/parameters/workspaceId'
+      - name: name
+        in: path
+        required: true
+        description: The name of a secret
+        schema:
+          type: string
+          format: SecretName
+          example: SECRET_NAME
+    get:
+      tags:
+        - workspace
+        - secret
+      summary: Get workspace secret by  name
+      description: Get metadata about the given secret in the given workspace. This does not reveal the secret value.
+      operationId: findWorkspaceSecretByName
+      responses:
+        200:
+          description: The secret was retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Secret'
+        404:
+          $ref: '#/components/responses/NotFound'
+          
   /workspaces/{workspaceId}/secrets/{secretId}/transfer:
     parameters:
       - $ref: '#/components/parameters/workspaceId'
@@ -803,6 +884,7 @@ paths:
           schema:
             type: string
             format: AccountReference
+            example: me
         - name: state
           in: query
           description: The state of executions to return
@@ -1129,6 +1211,13 @@ paths:
             type: string
             format: KeywordQuery
             example: twitter account
+        - name: owner
+          in: query
+          description: The owner of the tool
+          schema:
+            type: string
+            format: AccountReference
+            example: me
         - name: order
           in: query
           description: The order in which tools are returned
@@ -2119,6 +2208,7 @@ components:
           format: markdown
         required:
           type: boolean
+          default: true
         default:
           type: string
 
@@ -2139,6 +2229,7 @@ components:
           format: markdown
         required:
           type: boolean
+          default: true
         example:
           type: string
 
