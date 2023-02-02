@@ -4,7 +4,7 @@ info:
   description: ToolForge is the self-serve tools platform for teams
   contact:
     email: api@toolforge.io
-  version: 0.0.38
+  version: 0.0.39
 servers:
   - url: https://api.toolforge.io/v1
 tags:
