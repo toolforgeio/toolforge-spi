@@ -2288,6 +2288,8 @@ components:
         - $ref: '#/components/schemas/ContainerDescription'
         - type: object
           properties:
+            repository:
+              type: string
             currentVersion:
               $ref: '#/components/schemas/ContainerVersion'
             
