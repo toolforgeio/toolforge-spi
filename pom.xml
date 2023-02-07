@@ -232,6 +232,7 @@
     <modules>
         <module>model</module>
         <module>service</module>
+        <module>auth</module>
     </modules>
 
     <!-- For releasing to maven central -->

@@ -4,7 +4,7 @@ info:
   description: ToolForge is the self-serve tools platform for teams
   contact:
     email: api@toolforge.io
-  version: 0.0.39
+  version: 0.0.40
 servers:
   - url: https://api.toolforge.io/v1
 tags:
@@ -485,6 +485,27 @@ paths:
           $ref: '#/components/responses/NotFound'
         409:
           $ref: '#/components/responses/Conflict'
+
+  /containers/{containerId}/logs/push:
+    parameters:
+      - $ref: '#/components/parameters/containerId'
+    get:
+      tags:
+        - container
+      summary: Get push logs
+      description: Get the most recent docker push log entries for this container
+      operationId: getContainerPushLogs
+      responses:
+        200:
+          description: The tool was found successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContainerVersionPushLogEntries'
+        403:
+          $ref: '#/components/responses/Forbidden'
+        404:
+          $ref: '#/components/responses/NotFound'
 
   /containers/{containerId}/versions:
     parameters:
@@ -2166,6 +2187,48 @@ components:
           properties:
             default:
               type: boolean
+              
+    ContainerVersionPushOutcome:
+      type: string
+      enum:
+        # There was a problem with the Docker push
+        - push-failed
+        # The Docker image manifest could not be found (application/vnd.docker.distribution.manifest.v2+json)
+        - image-manifest-not-found
+        # The ToolForge manifest could not be found
+        - toolforge-manifest-not-found
+        # The Docker container manifest could not be found (application/vnd.docker.container.image.v1+json)
+        - container-manifest-not-found
+        # The Container ID in the manifest does not match the Container ID being pushed
+        - container-id-mismatch
+        # The ToolForge manifest is not valid
+        - invalid-manifest
+        # There was a generic internal error
+        - internal-error
+        # The push was successful
+        - success
+              
+    ContainerVersionPushLogEntry:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        digest:
+          type: string
+        outcome:
+          $ref: '#/components/schemas/ContainerVersionPushOutcome'
+
+    ContainerVersionPushLogEntries:
+      type: object
+      properties:
+        containerId:
+          type: string
+          format: ContainerId
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ContainerVersionPushLogEntry'
 
     ContainerTransfer:
       type: object
