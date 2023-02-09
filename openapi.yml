@@ -4,7 +4,7 @@ info:
   description: ToolForge is the self-serve tools platform for teams
   contact:
     email: api@toolforge.io
-  version: 0.0.40
+  version: 0.0.41
 servers:
   - url: https://api.toolforge.io/v1
 tags:
@@ -506,6 +506,30 @@ paths:
           $ref: '#/components/responses/Forbidden'
         404:
           $ref: '#/components/responses/NotFound'
+
+  /containers/{containerId}/validate/manifest:
+    parameters:
+      - $ref: '#/components/parameters/containerId'
+    post:
+      tags:
+        - container
+      summary: Validate container manifest
+      description: Analyze candidate container manifest for errors
+      operationId: validateContainerManifest
+      requestBody:
+        content:
+          'application/yaml':
+            schema:
+              $ref: '#/components/schemas/Manifest'
+      responses:
+        204:
+          description: The manifest validated successfully
+        403:
+          $ref: '#/components/responses/Forbidden'
+        404:
+          $ref: '#/components/responses/NotFound'
+        422:
+          $ref: '#/components/responses/UnprocessableEntity'
 
   /containers/{containerId}/versions:
     parameters:
@@ -1452,6 +1476,12 @@ components:
             $ref: '#/components/schemas/ErrorMessage'
     Gone:
       description: The object has expired.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ErrorMessage'
+    UnprocessableEntity:
+      description: There was a problem with the request body
       content:
         application/problem+json:
           schema:
